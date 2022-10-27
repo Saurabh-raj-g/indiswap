@@ -1,0 +1,12 @@
+.button_box {
+  position: relative;
+  width: 100%;
+  border-radius: 2vmin;
+  margin-bottom: 10px;
+  margin-top: 10px;
+  height: 50px;
+  background-color: rgb(135, 162, 235);
+}
+.button_box:hover {
+  background-color: blue;
+}

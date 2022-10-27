@@ -1,0 +1,15 @@
+.swap_box_toggler {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-self: stretch;
+  margin: 4px 0 4px 0;
+}
+.swap_box_toggler > p {
+  position: relative;
+  margin: auto;
+  color: white;
+  font-style: unset;
+  text-decoration: none;
+  cursor: pointer;
+}

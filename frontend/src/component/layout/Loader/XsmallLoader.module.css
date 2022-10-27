@@ -1,0 +1,42 @@
+.container1 {
+  position: relative;
+
+  width: 100%;
+  padding: 5px 2vmax 15px 2vmax;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  place-items: center;
+  max-width: 100%;
+}
+.loading {
+  position: relative;
+
+  width: 100%;
+  /* padding: 10px 2vmax 10px 2vmax; */
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  max-width: 100%;
+}
+
+.loading > div {
+  position: relative;
+  width: 4vw;
+  height: 4vw;
+  border-bottom: 5px solid rgba(255, 200, 0, 0.877);
+
+  border-radius: 50%;
+
+  animation: loadingRotate 800ms linear infinite;
+}
+
+@keyframes loadingRotate {
+  to {
+    transform: rotateZ(-360deg);
+  }
+}
+.text {
+  font-size: medium;
+  color: rgba(255, 200, 0, 0.877);
+}

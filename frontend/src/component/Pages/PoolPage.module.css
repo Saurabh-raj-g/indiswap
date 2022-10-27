@@ -1,0 +1,306 @@
+.container {
+  position: relative;
+  margin-left: 32.5vw;
+  margin-top: 20vh;
+  width: 35vw;
+  background-color: black;
+  border-radius: 5vmin;
+  z-index: 0.5;
+  box-shadow: 1%;
+}
+.button_box {
+  position: relative;
+  width: 100%;
+  border-radius: 2vmin;
+  margin-bottom: 10px;
+  height: 50px;
+}
+.button_box01 {
+  position: relative;
+  width: 100%;
+  border-radius: 2vmin;
+  margin-bottom: 10px;
+  margin-top: 10px;
+  height: 50px;
+}
+
+.container_box {
+  position: relative;
+  margin: 5vmin;
+  display: flex;
+  flex-direction: column;
+}
+.free_float {
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  padding: 10px 2vmax 10px 2vmax;
+}
+.free_float_left {
+  float: left;
+  color: white;
+}
+.free_float_right {
+  float: right;
+  color: white;
+}
+.box_overflow {
+  max-height: 400px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+}
+::-webkit-scrollbar {
+  width: 0px;
+}
+.box {
+  position: relative;
+  background-color: #6c757d;
+  border-radius: 2vmin;
+  width: 100%;
+  margin: auto auto 10px auto;
+  display: flex;
+  flex-direction: column;
+}
+.box1 {
+  position: relative;
+  width: 100%;
+  padding: 10px 2vmax 10px 2vmax;
+  overflow: hidden;
+  align-items: center;
+  justify-items: center;
+}
+.token_box {
+  float: left;
+  position: relative;
+  background-color: hsla(91, 100%, 88%, 0.932);
+  border-radius: 2vmin;
+  padding: 5px 1vmax;
+  font-size: large;
+  font-weight: bold;
+  align-items: center;
+  height: 35px;
+  width: 38%;
+  margin-top: 4px;
+
+  justify-items: center;
+
+  cursor: pointer;
+}
+.token_box_left {
+  float: left;
+  color: black;
+  position: relative;
+}
+.token_box_right {
+  position: relative;
+  float: right;
+  color: black;
+}
+.box_right {
+  margin: auto;
+  float: right;
+  color: white;
+  font-size: large;
+  font-weight: bold;
+  align-items: center;
+}
+.child_box {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  background-color: rgba(0, 21, 255, 0.039);
+  border-radius: 2vmin;
+  width: 100%;
+  padding: 10px 2vmax 10px 2vmax;
+  overflow: hidden;
+  color: white;
+}
+.child_box > div {
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-self: stretch;
+  padding: 5px 0 px 0;
+}
+.child_box > div > p {
+  position: relative;
+  margin: auto;
+  color: white;
+}
+.child_box_text {
+  font-size: small;
+}
+.arrow {
+  position: relative;
+  font-size: large;
+  font-weight: bold;
+  align-items: center;
+  justify-items: center;
+  padding: 0.5vmax;
+  cursor: pointer;
+}
+
+.creatpoolButton {
+  position: relative;
+  margin-left: 46vw;
+  margin-top: 0px;
+  width: 10vw;
+  border-radius: 1vmin;
+  z-index: 1;
+  box-shadow: 1%;
+}
+.iButton {
+  margin-left: 8px;
+}
+.input[type="text"] {
+  position: relative;
+  padding: 0 2vmax;
+  background-color: #f2f2f2;
+  height: 50px;
+  width: 100%;
+  border-radius: 50vmin;
+}
+.text {
+  margin-top: 12px;
+}
+
+.join {
+  /*margin: 5px 5px 5px 5px; */
+  position: relative;
+  font-size: large;
+  font-weight: bold;
+  align-items: center;
+  justify-items: center;
+  background-color: rgb(255, 196, 196);
+  border-radius: 1.5vmin;
+  padding: 0.6vmax;
+  cursor: pointer;
+}
+.simple {
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-self: stretch;
+}
+.simple > p {
+  margin: auto;
+}
+.simple > p > span {
+  position: relative;
+  margin-left: 1vmax;
+  color: blue;
+  cursor: pointer;
+}
+@media screen and (max-width: 1200px) {
+  .container {
+    position: relative;
+    margin-left: 29vw;
+    margin-top: 20vh;
+    width: 42vw;
+    background-color: black;
+    border-radius: 5vmin;
+    z-index: 0.5;
+    box-shadow: 1%;
+  }
+}
+@media screen and (max-width: 1005px) {
+  .container {
+    position: relative;
+    margin-left: 25vw;
+    margin-top: 20vh;
+    width: 50vw;
+    background-color: black;
+    border-radius: 5vmin;
+    z-index: 0.5;
+    box-shadow: 1%;
+  }
+  .creatpoolButton {
+    position: relative;
+    margin-left: 42vw;
+    margin-top: 0px;
+    width: 16vw;
+    border-radius: 1vmin;
+    z-index: 1;
+    box-shadow: 1%;
+  }
+}
+@media screen and (max-width: 785px) {
+  .container {
+    position: relative;
+    margin-left: 20vw;
+    margin-top: 20vh;
+    width: 60vw;
+    background-color: black;
+    border-radius: 5vmin;
+    z-index: 0.5;
+    box-shadow: 1%;
+  }
+  .creatpoolButton {
+    position: relative;
+    margin-left: 39vw;
+    margin-top: 0px;
+    width: 20vw;
+    border-radius: 1vmin;
+    z-index: 1;
+    box-shadow: 1%;
+  }
+}
+
+@media screen and (max-width: 615px) {
+  .container {
+    position: relative;
+    margin-left: 15vw;
+    margin-top: 20vh;
+    width: 70vw;
+    background-color: black;
+    border-radius: 5vmin;
+    z-index: 0.5;
+    box-shadow: 1%;
+  }
+}
+@media screen and (max-width: 515px) {
+  .container {
+    position: relative;
+    margin-left: 5vw;
+    margin-top: 20vh;
+    width: 90vw;
+    background-color: black;
+    border-radius: 5vmin;
+    z-index: 0.5;
+    box-shadow: 1%;
+  }
+  .creatpoolButton {
+    position: relative;
+    margin-left: 36vw;
+    margin-top: 0px;
+    width: 28vw;
+    border-radius: 1vmin;
+    z-index: 1;
+    box-shadow: 1%;
+  }
+}
+
+@media screen and (max-width: 385px) {
+  .container {
+    position: relative;
+    margin-left: 2.5vw;
+    margin-top: 20vh;
+    width: 95vw;
+    background-color: black;
+    border-radius: 5vmin;
+    z-index: 0.5;
+    box-shadow: 1%;
+  }
+  .creatpoolButton {
+    position: relative;
+    margin-left: 30vw;
+    margin-top: 0px;
+    width: 40vw;
+    border-radius: 1vmin;
+    z-index: 1;
+    box-shadow: 1%;
+  }
+}

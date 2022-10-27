@@ -1,0 +1,109 @@
+{
+	"compiler": {
+		"version": "0.8.15+commit.e14f2714"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"v2_periphery/UniswapV2Router02Part.sol": "UniswapV2Router02Part"
+		},
+		"evmVersion": "london",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": true,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"v2_periphery/UniswapV2Router02Part.sol": {
+			"keccak256": "0x7debcc4198aeee58a4967d490c1023382414cd1c587d6f8bc49502daf5014de4",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://b778d3f27d63cca663588ca4d07407eef9605130629624c495371dee1bbbc54b",
+				"dweb:/ipfs/QmakYQszDr3rVBAF9LPvyi4TmeW1dCrmXrAfzUCSTTZJtd"
+			]
+		},
+		"v2_periphery/interfaces/IERC20.sol": {
+			"keccak256": "0xeb2eb450aa829beb126f3d585fb0176a6de0ca256d29265fb6db5a6bc3672c3e",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://89c4b025b88e0ff566ba7c6311a9f19586adf8fe83b00dedc8e5e576ea7bb81e",
+				"dweb:/ipfs/QmVx3qkZwdZFN371XbjThpM1uq4xaVyBEMUYKTmatgYgXx"
+			]
+		},
+		"v2_periphery/interfaces/IUniswapV2Factory.sol": {
+			"keccak256": "0x9105dbc34a45f2e1d9f3e2d25f9dd63452c4441246c8831792a5d75465eb9a64",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://2efcd9a505e971d4732a3be825ce57b6ba217156e8e2bdce7d092b4b0c7bf2be",
+				"dweb:/ipfs/Qmc2sMtqn5aJSLyS3jHN4veVn4XMrGcof9RKdH8b9cxeyn"
+			]
+		},
+		"v2_periphery/interfaces/IUniswapV2Pair.sol": {
+			"keccak256": "0x8727e370b8d05a53e67d06ca7fa91c4e4aee11ded196b8d7632833347e9504e8",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://9d0e45b8df9ce1a94906c09041298c561ca2b769d3481a7cd1ebe55fe831812c",
+				"dweb:/ipfs/QmYnq3rkfWjievPFEjvfS1ps8L1EFxi5S4t46mJ6HSxQLM"
+			]
+		},
+		"v2_periphery/interfaces/IUniswapV2Router02.sol": {
+			"keccak256": "0x590cbebdf5f4ee497a10a578c5db0760bd1a057608745676a0591db7698aac21",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://d9aa97cd1091567004a9989ebd84c097901d04dc739112402a28a8a0b4ff4e4f",
+				"dweb:/ipfs/QmSJTjgcfes1YFCG6DELtuyDn5BTCUZJQfvF2uVWo7NKQp"
+			]
+		},
+		"v2_periphery/interfaces/IUniswapV2Router02Part.sol": {
+			"keccak256": "0xb6fac65c080a34e6def294cf0800550baf2468b69b0707760cf80bc31318c1c5",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://7b3bb68c9f6b0469bc97889ed34d829d4a3db7d5a44cb8beae20cd27049099bb",
+				"dweb:/ipfs/QmeTuLk8rnasDk8i8UHLA98s9jRf7U4DESuwwvPiJWqTnT"
+			]
+		},
+		"v2_periphery/interfaces/IWETH.sol": {
+			"keccak256": "0x3efaf8ddbdc47eb3963fc769ba415c2fc4152d98fcf95add068d43bd4168c36a",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://26f798b6bb84d0b1fb58706ae7dca1e7d9337980d520e9930fc321ac69a001e0",
+				"dweb:/ipfs/QmbSJD8METNBgj5jQhtUeuyQJtgW1JLQNQgYzsKQqVs2Jm"
+			]
+		},
+		"v2_periphery/libraries/TransferHelper.sol": {
+			"keccak256": "0xe3f68a8dcf70167cc96c576598052da363656c593866b721848992039227e92e",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://a8d18b5eafaf1fffaa14b2650cfbe2a17ef94b87464459e3eeb6123522dbb742",
+				"dweb:/ipfs/QmWofyqa5eFAY2jP2bhFyL6R3KQxtVKeN27ACYiRurBmk2"
+			]
+		},
+		"v2_periphery/libraries/UniswapV2Library.sol": {
+			"keccak256": "0x3d9a0dfbf55dbc4599211f926d1cc63e0b0af5023409dca42d9a7b6991d76cad",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://6c03da0d68f3e5eba5f8821974751a2a5bf3316d1c22764c1f5ff2de9ae8ee45",
+				"dweb:/ipfs/QmcvWWgGNYtwmwuqtQB63e9bdKE59mg9oJusYrpHVUoQVZ"
+			]
+		}
+	},
+	"version": 1
+}

@@ -1,0 +1,148 @@
+.iButton {
+  margin-left: 8px;
+}
+.input[type="text"] {
+  position: relative;
+  padding: 0 2vmax;
+  background-color: #f2f2f2;
+  height: 50px;
+  width: 100%;
+  border-radius: 50vmin;
+}
+.box_overflow {
+  max-height: 400px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+}
+.box {
+  position: relative;
+  background-color: #6c757d;
+  border-radius: 2vmin;
+  width: 100%;
+  padding: 10px 2vmax 0px 2vmax;
+  overflow: hidden;
+  align-items: center;
+  justify-items: center;
+  margin: auto auto 10px auto;
+  cursor: pointer;
+}
+/* .token_box {
+  float: left;
+  position: relative;
+  background-color: hsla(91, 100%, 88%, 0.932);
+  border-radius: 2vmin;
+
+  font-size: large;
+  font-weight: bold;
+  align-items: center;
+  height: 35px;
+  width: 20%;
+  margin-top: 4px;
+
+  justify-items: center;
+
+  cursor: pointer;
+}
+.token_box_left {
+  color: black;
+  position: relative;
+  padding: 5px 20px;
+  display: flex;
+  flex-direction: column;
+}
+.token_box_left > p {
+  margin: auto;
+} */
+
+.token_box {
+  float: left;
+  position: relative;
+
+  /* align-items: center; */
+  /* height: 35px;
+  width: 20%; */
+  /* margin-top: 4px; */
+
+  /* justify-items: center; */
+
+  cursor: pointer;
+}
+.token_box_left {
+  color: white;
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+}
+.token_box_left > p {
+  margin: 0px;
+  padding: 0px;
+}
+.token_logo {
+  max-height: 25px;
+  max-width: 25px;
+  min-height: 25px;
+  min-width: 25px;
+  align-items: center;
+  border-radius: 5px;
+}
+.token_box_right {
+  /* position: relative;
+  float: right;
+  color: black; */
+  /* position: relative;
+  justify-items: center;
+  align-items: center; */
+}
+.box_right {
+  margin: auto;
+  float: right;
+  color: white;
+  font-size: large;
+  font-weight: bold;
+  align-items: center;
+}
+.text {
+  margin-top: 12px;
+}
+
+.join {
+  /*margin: 5px 5px 5px 5px; */
+  position: relative;
+  font-size: large;
+  font-weight: bold;
+  align-items: center;
+  justify-items: center;
+  /* background-color: rgb(255, 196, 196);
+  border-radius: 1.5vmin; */
+  padding: 0.6vmax;
+}
+.join1 {
+  /*margin: 5px 5px 5px 5px; */
+  position: relative;
+  font-size: large;
+  font-weight: bold;
+  align-items: center;
+  justify-items: center;
+  /* background-color: rgb(255, 196, 196);
+  border-radius: 1.5vmin; */
+  padding: 0.6vmax;
+  color: rgba(0, 81, 255, 0.817);
+  cursor: pointer;
+}
+.simple {
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-self: stretch;
+}
+.simple > p {
+  margin: auto;
+}
+.simple > p > span {
+  cursor: pointer;
+  color: rgba(0, 85, 255, 0.7);
+  font-weight: 700;
+  font-size: large;
+}

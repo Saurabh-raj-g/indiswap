@@ -1,0 +1,79 @@
+{
+	"compiler": {
+		"version": "0.8.15+commit.e14f2714"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "token",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "amountTokenMin",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "amountETHMin",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "to",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "deadline",
+						"type": "uint256"
+					}
+				],
+				"name": "migrate",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"v2_periphery/interfaces/IUniswapV2Migrator.sol": "IUniswapV2Migrator"
+		},
+		"evmVersion": "london",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"v2_periphery/interfaces/IUniswapV2Migrator.sol": {
+			"keccak256": "0x97fa4771482cfa17f3c73e4a208839c107d08a1e368095cb5743b5793b6a8a9e",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://c6b3219ffbc2420b8382fcb08338242e5840ab2e7c99e5a31a360c453d360f5b",
+				"dweb:/ipfs/QmWMndrfh8b6XRHPpqhPAmFpJzB7QXxgKuiVXXE9HhKMvv"
+			]
+		}
+	},
+	"version": 1
+}

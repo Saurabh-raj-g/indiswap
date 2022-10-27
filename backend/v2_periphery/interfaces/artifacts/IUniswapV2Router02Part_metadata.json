@@ -1,0 +1,45 @@
+{
+	"compiler": {
+		"version": "0.8.15+commit.e14f2714"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"v2_periphery/interfaces/IUniswapV2Router02Part.sol": "IUniswapV2Router02Part"
+		},
+		"evmVersion": "london",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": true,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"v2_periphery/interfaces/IUniswapV2Router02Part.sol": {
+			"keccak256": "0xb6fac65c080a34e6def294cf0800550baf2468b69b0707760cf80bc31318c1c5",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://7b3bb68c9f6b0469bc97889ed34d829d4a3db7d5a44cb8beae20cd27049099bb",
+				"dweb:/ipfs/QmeTuLk8rnasDk8i8UHLA98s9jRf7U4DESuwwvPiJWqTnT"
+			]
+		}
+	},
+	"version": 1
+}

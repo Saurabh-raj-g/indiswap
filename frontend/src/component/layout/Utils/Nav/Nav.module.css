@@ -1,0 +1,18 @@
+.route_nav_box {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-self: stretch;
+  margin: 20px 0 20px 0;
+  /*border-bottom: solid;
+       padding-bottom: 20px;
+      border-bottom-width: 3px;
+      border-bottom-color: yellow; */
+}
+.route_nav_box > p {
+  position: relative;
+  margin: auto;
+  color: white;
+  font-style: unset;
+  text-decoration: none;
+}

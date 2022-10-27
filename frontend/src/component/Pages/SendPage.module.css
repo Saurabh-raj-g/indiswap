@@ -1,0 +1,188 @@
+.container {
+  position: relative;
+  margin-left: 32.5vw;
+  margin-top: 20vh;
+  width: 35vw;
+  background-color: black;
+  border-radius: 5vmin;
+  z-index: 0.5;
+  box-shadow: 1%;
+}
+.container_box {
+  position: relative;
+  margin: 5vmin;
+  display: flex;
+  flex-direction: column;
+}
+
+.input1 {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-self: stretch;
+  width: 100%;
+  margin: 5px 0 10px 0;
+}
+.input1_::-webkit-inner-spin-button,
+.input1_::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+
+.input1_[type="number"] {
+  -moz-appearance: textfield;
+  padding: 0 2vmax;
+  background-color: #f2f2f2;
+  max-height: 40px;
+  max-width: 50%;
+  min-width: 10px;
+  border-radius: 40px;
+  position: relative;
+  margin: auto;
+}
+.select_box {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-self: stretch;
+  width: 100%;
+  margin-top: 5px;
+}
+.select_box > p {
+  position: relative;
+  margin: auto;
+
+  cursor: pointer;
+
+  background-color: hsla(91, 100%, 88%, 0.932);
+  border-radius: 2vmin;
+  padding: 5px 1vmax;
+  font-size: large;
+  font-weight: bold;
+  align-items: center;
+  height: 35px;
+
+  color: black;
+  justify-items: center;
+}
+.add_box {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-self: stretch;
+  width: 100%;
+  margin-top: 5px;
+}
+.add_box > p {
+  position: relative;
+  margin: auto;
+  margin-top: 10px;
+  color: white;
+  padding: 7px;
+  background-color: rgba(0, 179, 255, 0.377);
+  border-radius: 1.5vmin;
+  cursor: pointer;
+}
+.rate {
+  cursor: pointer;
+}
+.rate:hover {
+  background-color: tomato;
+}
+.recipient_box {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+
+  background-color: #6c757d;
+  border-radius: 2vmin;
+  width: 100%;
+  padding: 6px 2vmax 6px 2vmax;
+  overflow: hidden;
+  margin: 10px 0;
+}
+.recipient {
+  margin-bottom: 5px;
+}
+.input2 {
+  padding: 0 2vmax;
+  background-color: #f2f2f2;
+  max-height: 40px;
+  width: 100%;
+  border-radius: 1vmin;
+  margin-top: -50px;
+  margin-bottom: 7px;
+}
+@media screen and (max-width: 1200px) {
+  .container {
+    position: relative;
+    margin-left: 29vw;
+    margin-top: 20vh;
+    width: 42vw;
+    background-color: black;
+    border-radius: 5vmin;
+    z-index: 0.5;
+    box-shadow: 1%;
+  }
+}
+@media screen and (max-width: 1005px) {
+  .container {
+    position: relative;
+    margin-left: 25vw;
+    margin-top: 20vh;
+    width: 50vw;
+    background-color: black;
+    border-radius: 5vmin;
+    z-index: 0.5;
+    box-shadow: 1%;
+  }
+}
+@media screen and (max-width: 785px) {
+  .container {
+    position: relative;
+    margin-left: 20vw;
+    margin-top: 20vh;
+    width: 60vw;
+    background-color: black;
+    border-radius: 5vmin;
+    z-index: 0.5;
+    box-shadow: 1%;
+  }
+}
+
+@media screen and (max-width: 615px) {
+  .container {
+    position: relative;
+    margin-left: 15vw;
+    margin-top: 20vh;
+    width: 70vw;
+    background-color: black;
+    border-radius: 5vmin;
+    z-index: 0.5;
+    box-shadow: 1%;
+  }
+}
+@media screen and (max-width: 515px) {
+  .container {
+    position: relative;
+    margin-left: 5vw;
+    margin-top: 20vh;
+    width: 90vw;
+    background-color: black;
+    border-radius: 5vmin;
+    z-index: 0.5;
+    box-shadow: 1%;
+  }
+}
+
+@media screen and (max-width: 385px) {
+  .container {
+    position: relative;
+    margin-left: 2.5vw;
+    margin-top: 20vh;
+    width: 95vw;
+    background-color: black;
+    border-radius: 5vmin;
+    z-index: 0.5;
+    box-shadow: 1%;
+  }
+}

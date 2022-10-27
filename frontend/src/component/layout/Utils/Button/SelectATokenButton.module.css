@@ -1,0 +1,8 @@
+.button_box {
+  position: relative;
+  width: 100%;
+  border-radius: 2vmin;
+  margin-bottom: 10px;
+  height: 50px;
+  margin-top: 10px;
+}

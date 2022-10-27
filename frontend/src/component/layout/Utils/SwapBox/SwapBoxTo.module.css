@@ -1,0 +1,89 @@
+.swap_box {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background-color: #6c757d;
+  border-radius: 4vmin;
+  width: 100%;
+  padding: 10px 2vmax 10px 2vmax;
+  overflow: hidden;
+  color: white;
+}
+.swap_box > div {
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+.balance {
+  float: right;
+}
+.from {
+  float: left;
+}
+.input1::-webkit-inner-spin-button,
+.input1::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+
+.input1[type="number"] {
+  -moz-appearance: textfield;
+  padding: 0 2vmax;
+  background-color: #f2f2f2;
+  max-height: 40px;
+  max-width: 40%;
+  min-width: 10px;
+  float: left;
+  border-radius: 40px;
+  margin-right: 5%;
+}
+.left {
+  float: left;
+  margin-top: 10px;
+  margin-bottom: -0px;
+}
+.input2::-webkit-inner-spin-button,
+.input2::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+
+.input2[type="number"] {
+  -moz-appearance: textfield;
+  padding: 0 1vmax;
+  background-color: #f2f2f2;
+  max-height: 40px;
+  width: 40%;
+  min-width: 10px;
+  float: right;
+  border-radius: 40px;
+  margin-right: 5%;
+  margin-top: 10px;
+  margin-bottom: -0px;
+}
+.tk_right {
+  position: relative;
+  float: right;
+  width: 55%;
+}
+.max {
+  float: left;
+  position: relative;
+  cursor: pointer;
+}
+.max:hover {
+  color: rgba(255, 114, 71, 0.879);
+}
+.select {
+  float: right;
+  cursor: pointer;
+  position: relative;
+  background-color: hsla(91, 100%, 88%, 0.932);
+  border-radius: 2vmin;
+  padding: 5px 1vmax;
+  font-size: large;
+  font-weight: bold;
+  align-items: center;
+  height: 35px;
+
+  color: black;
+  justify-items: center;
+}

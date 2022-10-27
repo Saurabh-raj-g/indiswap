@@ -1,0 +1,53 @@
+{
+	"compiler": {
+		"version": "0.8.15+commit.e14f2714"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"v2_periphery/libraries/UniswapV2Library.sol": "UniswapV2Library"
+		},
+		"evmVersion": "london",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": true,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"v2_periphery/interfaces/IUniswapV2Pair.sol": {
+			"keccak256": "0x8727e370b8d05a53e67d06ca7fa91c4e4aee11ded196b8d7632833347e9504e8",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://9d0e45b8df9ce1a94906c09041298c561ca2b769d3481a7cd1ebe55fe831812c",
+				"dweb:/ipfs/QmYnq3rkfWjievPFEjvfS1ps8L1EFxi5S4t46mJ6HSxQLM"
+			]
+		},
+		"v2_periphery/libraries/UniswapV2Library.sol": {
+			"keccak256": "0xe12708f44a534fe47fc41f4affe37df6399b70166b55957c989c345010f51bba",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://9248c11755224656dc0925db353227a5f06cc1b6e12064881b9bc5fea2ae7597",
+				"dweb:/ipfs/QmZAv7fyrBWaxakrvYXkFBox1W8bBsqSi8keCywZUYb9aU"
+			]
+		}
+	},
+	"version": 1
+}

@@ -1,0 +1,450 @@
+/* .container1 {
+  position: relative;
+  display: flex;
+  margin: 0 10px 0 10px;
+  background-color: #6c757d;
+ 
+  border-radius: 20px;
+  flex-direction: row;
+  align-items: center;
+  justify-items: center;
+}
+.balancebox {
+  position: relative;
+  margin: 5px 5px 5px 10px;
+  padding: 5px;
+  background-color: hsla(91, 100%, 88%, 0.932);
+  border-radius: 20px;
+  font-size: large;
+  font-weight: bold;
+  align-items: center;
+}
+.accountaddressbox {
+  position: relative;
+  margin: 5px 10px 5px 5px;
+  padding: 5px;
+  background-color: hsla(91, 100%, 88%, 0.932);
+  border-radius: 20px;
+  font-size: medium;
+  font-weight: bold;
+  align-items: center;
+} */
+.container1 {
+  position: relative;
+  /* display: flex; */
+  margin: 0 10px 0 10px;
+  background-color: #6c757d;
+
+  border-radius: 20px;
+  /* flex-direction: row; */
+  align-items: center;
+  justify-items: center;
+  display: inline-block;
+}
+.balancebox {
+  position: relative;
+  margin: 5px 5px 5px 10px;
+  padding: 5px;
+  background-color: hsla(91, 100%, 88%, 0.932);
+  border-radius: 20px;
+  font-size: large;
+  font-weight: bold;
+  align-items: center;
+}
+.accountaddressbox {
+  position: relative;
+  margin: 5px 10px 5px 10px;
+  padding: 5px;
+  background-color: hsla(91, 100%, 88%, 0.932);
+  border-radius: 20px;
+  font-size: medium;
+  font-weight: bold;
+  align-items: center;
+}
+.networkDropdown {
+  /* display: flex; */
+  margin: 0 10px 0 10px;
+  background-color: #6c757d;
+  /* background-color: rgb(255, 196, 196); */
+  border-radius: 20px;
+  /* flex-direction: row; */
+  align-items: center;
+  justify-items: center;
+  position: relative;
+  display: inline-block;
+}
+/* .dropdownWallet {
+  position: relative;
+  background-color: rgba(255, 117, 71, 0.941);
+  border-radius: 30px;
+  font-size: 1.2vw;
+  font-weight: bold;
+  align-items: center;
+  width: 12vmax;
+  max-height: 50px;
+  padding: 2% 1%;
+} */
+/* .dropdownWalletMenu {
+  visibility: hidden;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  margin-right: 400px;
+  background-color: #f1f1f1;
+  width: 22vw;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  border-radius: 16px;
+  z-index: 1;
+  padding: 3% 2%;
+  cursor: text;
+} */
+/* .dropdownWalletItem {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  font-size: medium;
+  font-weight: bold;
+} */
+/* .dropdownWalletItem:hover {
+  border-radius: 16px;
+  cursor: pointer;
+} */
+/* .dropdownWalletMenu1 {
+  border-radius: 16px;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  top: 60px;
+  visibility: visible;
+  padding: 3% 2%;
+  background-color: #f1f1f1;
+  width: 22vw;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  border-radius: 16px;
+  z-index: 1;
+  margin-right: 400px;
+  cursor: text;
+} */
+.dropdownWalletMenu {
+  background-color: "white";
+  border-radius: "20px";
+  width: 20vw;
+  margin-top: 7vh;
+}
+.dnav {
+  position: relative;
+  display: flex;
+  justify-items: stretch;
+  width: 100%;
+}
+.dnav > p {
+  margin: auto;
+}
+.dbalance {
+  position: relative;
+  display: flex;
+  justify-items: stretch;
+  width: 100%;
+  padding-top: 15px;
+}
+.dbalance > p {
+  position: relative;
+  margin: auto;
+  font-size: 1.5vw;
+}
+.dbalance > p > span {
+  font-size: 1.5vw;
+  color: orange;
+  margin-left: 5px;
+}
+.dlanguage {
+  position: relative;
+  width: 100%;
+  padding: 5px 10px 0px 10px;
+}
+.dlanguageLeft {
+  position: relative;
+  float: left;
+}
+.dlanguageRight {
+  position: relative;
+  float: right;
+}
+.networkDropdownMenu {
+  display: none;
+  position: absolute;
+
+  background-color: #f1f1f1;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  border-radius: 16px;
+  z-index: 1;
+}
+.networkDropdownItem {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  font-size: medium;
+  font-weight: bold;
+}
+.networkDropdownItem:hover {
+  background-color: #ddd;
+  border-radius: 16px;
+  cursor: pointer;
+}
+.networkDropdown:hover .networkDropdownMenu {
+  border-radius: 16px;
+  position: fixed;
+  top: 55px;
+  display: block;
+}
+.setting {
+  margin: 5px 5px 5px 5px;
+  position: relative;
+  font-size: large;
+  font-weight: bold;
+  align-items: center;
+  justify-items: center;
+  color: white;
+}
+
+.networkName {
+  position: relative;
+  margin: 5px 5px 5px 10px;
+  padding: 5px;
+  background-color: hsla(91, 100%, 88%, 0.932);
+  border-radius: 20px;
+  font-size: large;
+  font-weight: bold;
+  align-items: center;
+}
+
+.connectWallet {
+  position: relative;
+  background-color: rgba(255, 117, 71, 0.941);
+  border-radius: 30px;
+  font-size: 1.2vw;
+  font-weight: bold;
+  align-items: center;
+  width: 12vmax;
+  max-height: 50px;
+  padding: 2% 1%;
+}
+.connectWalletNotConnected {
+  position: relative;
+  font-size: 1.5vw;
+  margin-left: 1.2vw;
+  margin-top: 2%;
+}
+.connectWalletNotConnected:hover {
+  color: white;
+  cursor: pointer;
+}
+.connectWalletNotConnected1 {
+  position: relative;
+  font-size: 1.5vw;
+  margin-top: 2%;
+}
+.connectWalletNotConnected2 {
+  position: relative;
+  font-size: 1.5vw;
+  margin-top: 2%;
+}
+.connectWalletNotConnected2:hover {
+  color: white;
+  cursor: pointer;
+}
+.connectWalletPending {
+  font-size: 1.5vw;
+  margin-left: 2.5vw;
+  color: white;
+}
+.connectWallet:hover {
+  background-color: rgba(255, 92, 71, 0.74);
+}
+.dropdown-menu {
+  margin-left: -100px;
+}
+.dropDownItemInput {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+.slipageWallet {
+  position: relative;
+  background-color: black;
+  border-radius: 35px;
+  font-size: large;
+  font-weight: bold;
+  align-items: center;
+  padding: 0px;
+  margin-right: 2%;
+  min-width: 60px;
+  color: white;
+}
+.slipageWallet:hover {
+  background-color: rgba(0, 140, 255, 0.667);
+}
+.slipageWalletActive {
+  background-color: blue;
+}
+
+.slipapageInput {
+  position: relative;
+  padding: 0 2vmin;
+  background-color: rgba(0, 0, 0, 0.486);
+  max-height: 40px;
+  width: 100px;
+  margin-right: 15px;
+  border-radius: 40px;
+  color: white;
+}
+.percentageSymbol {
+  position: relative;
+  margin-left: -53px;
+  color: white;
+}
+.dropDownMenu {
+  margin-top: 7vh;
+}
+.slipapageInput::-webkit-inner-spin-button,
+.slipapageInput::-webkit-outer-spin-button,
+.deadlineInput::-webkit-inner-spin-button,
+.deadlineInput::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+.slipapageInput::placeholder {
+  color: wheat;
+}
+.deadlineInput {
+  position: relative;
+  padding: 0 2vmin;
+  background-color: rgba(0, 0, 0, 0.486);
+  max-height: 40px;
+  width: 100px;
+  margin-right: -5px;
+  border-radius: 40px;
+  color: white;
+}
+.dropDownItem:hover {
+  background-color: rgba(0, 229, 255, 0.782);
+}
+
+@media screen and (max-width: 1230px) {
+  .dropdownWalletMenu {
+    background-color: "white";
+    border-radius: "20px";
+    width: 25vw;
+  }
+}
+@media screen and (max-width: 1030px) {
+  .dropdownWalletMenu {
+    background-color: "white";
+    border-radius: "20px";
+    width: 30vw;
+  }
+}
+@media screen and (max-width: 850px) {
+  .dropdownWalletMenu {
+    background-color: "white";
+    border-radius: "20px";
+    width: 40vw;
+    margin-left: -10vw;
+  }
+}
+
+@media screen and (max-width: 575px) {
+  /* .navbarcss {
+    margin-bottom: 1vh;
+    margin-left: 35vw;
+    background-color: black;
+  } */
+  .navbarcss {
+    padding: 0;
+    position: relative;
+    margin-top: 2%;
+    display: flex;
+    flex-direction: row;
+    justify-items: stretch;
+  }
+  .navbarcss > .navbarcss1 {
+    margin: auto;
+    padding: 0;
+  }
+
+  .dropdownWalletMenu {
+    background-color: "white";
+    border-radius: "20px";
+    width: 60vw;
+    margin-left: -10vw;
+  }
+  .dbalance > p {
+    position: relative;
+    margin: auto;
+    font-size: 4vw;
+  }
+  .dbalance > p > span {
+    font-size: 4vw;
+    color: orange;
+    margin-left: 5px;
+  }
+}
+@media screen and (max-width: 400px) {
+  .accountaddressbox {
+    position: relative;
+    margin: 5px 2px 5px 2px;
+    padding: 5px;
+    background-color: hsla(91, 100%, 88%, 0.932);
+    border-radius: 20px;
+    font-size: 3.5vw;
+    font-weight: bold;
+    align-items: center;
+  }
+  .dropdownWalletMenu {
+    background-color: "white";
+    border-radius: "20px";
+    width: 70vw;
+    margin-left: -10vw;
+  }
+  .setting {
+    margin: 0px;
+    position: relative;
+    font-size: xx-small;
+    font-weight: bold;
+    align-items: center;
+    justify-items: center;
+    color: white;
+  }
+}
+
+@media screen and (max-width: 280px) {
+  .accountaddressbox {
+    position: relative;
+    margin: 5px 2px 5px 2px;
+    padding: 0px;
+    background-color: hsla(91, 100%, 88%, 0.932);
+    border-radius: 20px;
+    font-size: 3vw;
+    font-weight: bold;
+    align-items: center;
+  }
+  .dropdownWalletMenu {
+    background-color: "white";
+    border-radius: "20px";
+    width: 85vw;
+    margin-left: -25vw;
+  }
+  .setting {
+    margin: -2px;
+    position: relative;
+    font-size: xx-small;
+    font-weight: bold;
+    align-items: center;
+    justify-items: center;
+    color: white;
+  }
+}

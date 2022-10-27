@@ -1,0 +1,45 @@
+{
+	"compiler": {
+		"version": "0.8.7+commit.e28d00a7"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"v2_periphery/libraries/FullMath.sol": "FullMath"
+		},
+		"evmVersion": "london",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"v2_periphery/libraries/FullMath.sol": {
+			"keccak256": "0x2bce1f3df10d58f222cb98bb6477a8cdcf1870f5655b2cf44fdc5beae9d07834",
+			"license": "CC-BY-4.0",
+			"urls": [
+				"bzz-raw://53a79c44cf05a86b603ac7028165ba03b222eacc2db2d770aa16958607f22f6a",
+				"dweb:/ipfs/QmdNMQhQjxn2r7fh1okRm5Wp3N4TuR4GjPcRpSwM4TQUVD"
+			]
+		}
+	},
+	"version": 1
+}

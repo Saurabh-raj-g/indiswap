@@ -1,0 +1,68 @@
+.customClass {
+  width: 35vw;
+  margin: 8% 0 0 30%;
+  border-radius: 90px;
+}
+.customBody {
+  position: relative;
+  background-color: #6c757d;
+  color: white;
+}
+
+.modalbody {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 1% 3%;
+}
+.leftItem {
+  position: relative;
+  float: left;
+}
+.rightItem {
+  position: relative;
+  float: right;
+}
+.tt0 {
+  position: relative;
+
+  width: 100%;
+  padding: 10px 2vmax 10px 2vmax;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  max-width: 100%;
+  color: rgb(0, 81, 128);
+}
+/* .tt0 > div {
+  position: relative;
+  width: 6vw;
+  height: 6vw;
+} */
+.tt1 {
+  position: "relative";
+  display: flex;
+  justify-content: stretch;
+}
+.tt1 > span {
+  margin: auto;
+  font-size: 2vw;
+}
+.tt2 {
+  position: "relative";
+  display: flex;
+  justify-content: stretch;
+}
+.tt2 > span {
+  margin: auto;
+}
+.tt3 {
+  position: "relative";
+  display: flex;
+  justify-content: stretch;
+}
+.tt3 > span {
+  margin: auto;
+  font-size: small;
+  color: antiquewhite;
+}

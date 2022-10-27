@@ -1,0 +1,45 @@
+{
+	"compiler": {
+		"version": "0.8.15+commit.e14f2714"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"v2_periphery/libraries/BitMath.sol": "BitMath"
+		},
+		"evmVersion": "london",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"v2_periphery/libraries/BitMath.sol": {
+			"keccak256": "0xc7f660415249c9422bc0e7e4f9b34f6c9bd98161c2bd3bb81e3c0fc4c0e8094a",
+			"license": "GPL-3.0-or-later",
+			"urls": [
+				"bzz-raw://c24f3324954b602b96cd0f75ce611ce44d8a77111d18cfec4fa401ab282c1d37",
+				"dweb:/ipfs/QmZaycvB1d4FiDNDesyzTi7X8Z36QKFw2PXqBV2Mk54GG3"
+			]
+		}
+	},
+	"version": 1
+}

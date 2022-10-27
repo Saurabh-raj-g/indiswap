@@ -1,0 +1,193 @@
+.container {
+  position: relative;
+  margin-left: 32.5vw;
+  margin-top: 20vh;
+  width: 35vw;
+  background-color: black;
+  border-radius: 5vmin;
+  z-index: 1;
+  box-shadow: 1%;
+}
+
+.container_box {
+  position: relative;
+  margin: 5vmin;
+  display: flex;
+  flex-direction: column;
+}
+.header_box {
+  position: relative;
+  margin-top: 20px;
+  color: white;
+  width: 100%;
+}
+.header_left {
+  float: left;
+  position: relative;
+}
+.header_middle {
+  position: relative;
+  margin-left: 35%;
+  float: left;
+}
+.header_right {
+  position: relative;
+  float: right;
+}
+/* .header_right > p {
+    position: relative;
+    padding: 10px;
+    background-color: #6c757d;
+    height: 40px;
+    border-radius: 50px;
+  } */
+
+.item1Left {
+  float: left;
+  padding: 10px 2vmax 10px 2vmax;
+}
+.box {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background-color: #6c757d;
+  border-radius: 4vmin;
+  width: 100%;
+  color: white;
+  margin: 15px 0 10px 0;
+}
+.child_box {
+  position: relative;
+  margin-top: -10px;
+  display: flex;
+  flex-direction: column;
+  background-color: rgba(0, 21, 255, 0.039);
+  border-radius: 2vmin;
+  width: 100%;
+  padding: 10px 2vmax 10px 2vmax;
+  overflow: hidden;
+  color: white;
+}
+.child_box > div {
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-self: stretch;
+  padding: 5px 0 px 0;
+}
+.child_box > div > p {
+  position: relative;
+  margin: auto;
+  color: white;
+}
+.child_box_text {
+  font-size: small;
+}
+.button_box {
+  position: relative;
+  width: 100%;
+  border-radius: 2vmin;
+  margin: 15px 0px 20px 0;
+  height: 50px;
+}
+/* .inputRangeSlider {
+  margin-top: 10px;
+}
+.inputRangeSlider:hover {
+  cursor: pointer;
+} */
+.scrubber {
+  width: 100%;
+}
+.tooltip {
+  display: none;
+  position: relative;
+  color: white;
+}
+.scrubberContainer:hover p {
+  display: block;
+  position: fixed;
+  overflow: hidden;
+}
+/* .button_box {
+    position: relative;
+    width: 100%;
+    border-radius: 2vmin;
+    margin-bottom: 10px;
+    height: 50px;
+  } */
+@media screen and (max-width: 1200px) {
+  .container {
+    position: relative;
+    margin-left: 29vw;
+    margin-top: 20vh;
+    width: 42vw;
+    background-color: black;
+    border-radius: 5vmin;
+    z-index: 0.5;
+    box-shadow: 1%;
+  }
+}
+@media screen and (max-width: 1005px) {
+  .container {
+    position: relative;
+    margin-left: 25vw;
+    margin-top: 20vh;
+    width: 50vw;
+    background-color: black;
+    border-radius: 5vmin;
+    z-index: 0.5;
+    box-shadow: 1%;
+  }
+}
+@media screen and (max-width: 785px) {
+  .container {
+    position: relative;
+    margin-left: 20vw;
+    margin-top: 20vh;
+    width: 60vw;
+    background-color: black;
+    border-radius: 5vmin;
+    z-index: 0.5;
+    box-shadow: 1%;
+  }
+}
+
+@media screen and (max-width: 615px) {
+  .container {
+    position: relative;
+    margin-left: 15vw;
+    margin-top: 20vh;
+    width: 70vw;
+    background-color: black;
+    border-radius: 5vmin;
+    z-index: 0.5;
+    box-shadow: 1%;
+  }
+}
+@media screen and (max-width: 515px) {
+  .container {
+    position: relative;
+    margin-left: 5vw;
+    margin-top: 20vh;
+    width: 90vw;
+    background-color: black;
+    border-radius: 5vmin;
+    z-index: 0.5;
+    box-shadow: 1%;
+  }
+}
+
+@media screen and (max-width: 385px) {
+  .container {
+    position: relative;
+    margin-left: 2.5vw;
+    margin-top: 20vh;
+    width: 95vw;
+    background-color: black;
+    border-radius: 5vmin;
+    z-index: 0.5;
+    box-shadow: 1%;
+  }
+}

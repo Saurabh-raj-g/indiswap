@@ -1,0 +1,85 @@
+{
+	"compiler": {
+		"version": "0.8.15+commit.e14f2714"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"v2_periphery/libraries/UniswapV2LiquidityMathLibrary.sol": "UniswapV2LiquidityMathLibrary"
+		},
+		"evmVersion": "london",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"v2_periphery/interfaces/IUniswapV2Factory.sol": {
+			"keccak256": "0x9105dbc34a45f2e1d9f3e2d25f9dd63452c4441246c8831792a5d75465eb9a64",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://2efcd9a505e971d4732a3be825ce57b6ba217156e8e2bdce7d092b4b0c7bf2be",
+				"dweb:/ipfs/Qmc2sMtqn5aJSLyS3jHN4veVn4XMrGcof9RKdH8b9cxeyn"
+			]
+		},
+		"v2_periphery/interfaces/IUniswapV2Pair.sol": {
+			"keccak256": "0x8727e370b8d05a53e67d06ca7fa91c4e4aee11ded196b8d7632833347e9504e8",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://9d0e45b8df9ce1a94906c09041298c561ca2b769d3481a7cd1ebe55fe831812c",
+				"dweb:/ipfs/QmYnq3rkfWjievPFEjvfS1ps8L1EFxi5S4t46mJ6HSxQLM"
+			]
+		},
+		"v2_periphery/libraries/Babylonian.sol": {
+			"keccak256": "0x9a31bd205fc405edc3be0cad253f7722fccac8d991e755ee6f0e699a26c4bca4",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://5a10f35cb98b9973ea0f0570f111f4f9c3dd567c2c82f59a2f6e9829dd96753a",
+				"dweb:/ipfs/QmYwTHRrTxNR9D7uafig9yr5KkcLivzHthBzEmFcZWAJJu"
+			]
+		},
+		"v2_periphery/libraries/FullMath.sol": {
+			"keccak256": "0xc3a483f140b9bb2bfdba305d371a224e360a6703f12db61d1fddd9b2ba4cf6f1",
+			"license": "CC-BY-4.0",
+			"urls": [
+				"bzz-raw://5b994cb9b08506fe9ed8ccbefede33147e26e280faf56a076983e089f93409d6",
+				"dweb:/ipfs/QmTuS91wCHzW7qXY9RR3oyNY4jg1WeGk6uxY5xeMtuccrL"
+			]
+		},
+		"v2_periphery/libraries/UniswapV2Library.sol": {
+			"keccak256": "0x3d9a0dfbf55dbc4599211f926d1cc63e0b0af5023409dca42d9a7b6991d76cad",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://6c03da0d68f3e5eba5f8821974751a2a5bf3316d1c22764c1f5ff2de9ae8ee45",
+				"dweb:/ipfs/QmcvWWgGNYtwmwuqtQB63e9bdKE59mg9oJusYrpHVUoQVZ"
+			]
+		},
+		"v2_periphery/libraries/UniswapV2LiquidityMathLibrary.sol": {
+			"keccak256": "0xc5957e738ead773869ebcfa165524f568795d1787686d77feb750522aa43eac7",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://dc45d43fc42757a82011600649688976b5974d25d791e0173f60df480ebd9e40",
+				"dweb:/ipfs/QmTeqJcuKMg9SnyFtomR3Xc5odYon2RajEDi8qszL6BnTf"
+			]
+		}
+	},
+	"version": 1
+}
