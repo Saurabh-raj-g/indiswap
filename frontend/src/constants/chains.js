@@ -27,14 +27,22 @@ getNetworkInfo.set(ChainId.SMARTCHAIN, {
 });
 
 export const routerAddress = new Map();
-routerAddress.set(ChainId.GÖRLI, "0xF084e30459bc708720C8AB4aF7Ea09e934488845");
+// previous
+
+//routerAddress.set(ChainId.GÖRLI, "0xF084e30459bc708720C8AB4aF7Ea09e934488845");
+
+routerAddress.set(ChainId.GÖRLI, "0xE37982798d07563020A9994243B361e8eAe6E57b");
 routerAddress.set(
   ChainId.SMARTCHAIN,
   "0xF084e30459bc708720C8AB4aF7Ea09e934488845"
 );
 
 export const factoryAddress = new Map();
-factoryAddress.set(ChainId.GÖRLI, "0x9740fcc1a7841c462c85fcdfe3766e9befdc8ca9");
+// previous
+
+//factoryAddress.set(ChainId.GÖRLI, "0x9740fcc1a7841c462c85fcdfe3766e9befdc8ca9");
+
+factoryAddress.set(ChainId.GÖRLI, "0x5E0A08CcBdddA6bce560C9CD752D0ff78e051D36");
 factoryAddress.set(
   ChainId.SMARTCHAIN,
   "0x9740FcC1a7841C462C85FCDFe3766e9BEFDC8CA9"
@@ -70,7 +78,7 @@ export const changeNetwork = async (chainId) => {
         }
       } catch (addError) {
         return;
-        alert("Having trouble to switch the network");
+        //alert("Having trouble to switch the network");
       }
     }
     // handle other "switch" errors

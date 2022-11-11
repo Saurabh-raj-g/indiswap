@@ -16,46 +16,33 @@ import { HashRouter, Route, Routes } from "react-router-dom";
 import WebFont from "webfontloader";
 import { slippageAction, deadlineAction } from "./actions/utilsAction";
 import { useDispatch, useSelector } from "react-redux";
-import { login } from "./actions/userAction";
+import { login, logout } from "./actions/userAction";
 //import { useAlert } from "react-alert";
 import store from "./store";
 import NetworkProvider from "./networkProvider";
 
 import { ethers } from "ethers";
-import { getNetwork } from "./actions/contractFunction";
+import { getNetwork, SmartRoutes } from "./actions/contractFunction";
 function App() {
   const dispatch = useDispatch();
   const [networkId, setNetworkId] = useState();
   // const alert = useAlert();
   const { user, error, isAuthenticated } = useSelector((state) => state.user);
+
   async function log() {
     //console.log(isAuthenticated);
     if (isAuthenticated) {
       dispatch(login());
-      // console.log(isAuthenticated);
-      // setIsStateChanged(!isStateChanged);
     }
   }
   useEffect(() => {
-    // if (error) {
-    //   alert.error(error);
-    //   dispatch(clearErrors());
-    // }
-
-    // if (isAuthenticated) {
-    //   store.dispatch(myPooledAssetsAction(user));
-    //   store.dispatch(PoolAssetsAction(isAuthenticated, user));
-    // }
-    // if (!isAuthenticated) {
-    //   if (Cookies.get("INDISWAPUSER")) {
-    //     dispatch(login());
-    //   }
-    //   dispatch(PoolAssetsAction(isAuthenticated, user));
-    // }
-
+    //SmartRoutes();
+    window.ethereum.on("disconnect", async function (e) {
+      e.preventDefault();
+      dispatch(logout());
+    });
     window.ethereum.on("accountsChanged", async function () {
       await log();
-      // console.log(isAuthenticated);
     });
     window.ethereum.on("chainChanged", async function () {
       let provider = new ethers.providers.Web3Provider(window.ethereum);

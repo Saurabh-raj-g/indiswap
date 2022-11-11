@@ -81,6 +81,7 @@ const SendPage = (props) => {
   const send = async () => {
     setButtonClicked(true);
     dispatch(transactionStatusAction(3));
+
     const p = await sendToken(
       tokenData.tokenAddress,
       props.network.wethAddress,

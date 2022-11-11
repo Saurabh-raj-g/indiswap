@@ -45,12 +45,14 @@ import { useAlert } from "react-alert";
 import InsufficientBalanceButton from "../layout/Utils/Button/InsufficientBalanceButton";
 import DynamicButton from "../layout/Utils/Button/DynamicButton";
 
+import FontSizeLoader from ".././layout/Loader/FontSizeLoader.js";
 const AddLiquidityPage = (props) => {
   const Navigate = useNavigate();
   const dispatch = useDispatch();
   const alert = useAlert();
 
   const [modal, setModal] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
 
   const [isConfirmTransactionModal, setIsConfirmTransactionModal] =
     useState(false);
@@ -77,6 +79,10 @@ const AddLiquidityPage = (props) => {
 
   const { slippage } = useSelector((state) => state.slippage);
   const { deadline } = useSelector((state) => state.deadline);
+
+  const setFetching = async (t) => {
+    setIsFetching(t);
+  };
 
   const togglemodal = () => {
     setModal(!modal);
@@ -247,7 +253,13 @@ const AddLiquidityPage = (props) => {
     setAddLiquidityButtonClicked(true);
     dispatch(transactionStatusAction(3));
     const p = await addLiquidity(
+      // (await token0Data.isEth)
+      //   ? props.network.wethAddress
+      //   :
       token0Data.tokenAddress,
+      // (await token1Data.isEth)
+      //   ? props.network.wethAddress
+      //   :
       token1Data.tokenAddress,
       input0,
       input1,
@@ -357,22 +369,48 @@ const AddLiquidityPage = (props) => {
         setToken1Data(t1);
       }
     }
-    if (token0Data && token1Data && !input0 && !input1) {
-      const reserves = await fetchReserves(
-        token0Data.tokenAddress,
-        token1Data.tokenAddress,
-        props.network.factory
-      );
-      if (reserves[0] === 0 && reserves[1] === 0) {
-        let p = [];
-        p.push(0);
-        p.push(0);
-        setPoolPrice(p);
-      } else {
-        let p = [];
-        p.push(reserves[1] / reserves[0]);
-        p.push(reserves[0] / reserves[1]);
-        setPoolPrice(p);
+    if (
+      (token0Data &&
+        token1Data &&
+        token0Data.isEth &&
+        (await token1Data.tokenAddress
+          .toString()
+          .toLowerCase()
+          .includes(
+            await props.network.wethAddress.toString().toLowerCase()
+          ))) ||
+      (token0Data &&
+        token1Data &&
+        (await token0Data.tokenAddress
+          .toString()
+          .toLowerCase()
+          .includes(
+            await props.network.wethAddress.toString().toLowerCase()
+          )) &&
+        token1Data.isEth)
+    ) {
+    } else {
+      if (token0Data && token1Data && !input0 && !input1) {
+        const reserves = await fetchReserves(
+          token0Data.isEth
+            ? props.network.wethAddress
+            : token0Data.tokenAddress,
+          token1Data.isEth
+            ? props.network.wethAddress
+            : token1Data.tokenAddress,
+          props.network.factory
+        );
+        if (reserves[0] === 0 && reserves[1] === 0) {
+          let p = [];
+          p.push(0);
+          p.push(0);
+          setPoolPrice(p);
+        } else {
+          let p = [];
+          p.push(reserves[1] / reserves[0]);
+          p.push(reserves[0] / reserves[1]);
+          setPoolPrice(p);
+        }
       }
     }
     if (poolPrice[2]) {
@@ -392,51 +430,75 @@ const AddLiquidityPage = (props) => {
   }, [dispatch, input0, input1, deadline, user, error, alert, isAuthenticated]);
   // if token change
   async function load2(t0, t1, amount, isAmountBGiven) {
-    const reserves = await fetchReserves(
-      t0.tokenAddress,
-      t1.tokenAddress,
-      props.network.factory
-    );
-    if (reserves[0] === 0 && reserves[1] === 0) {
-      let p = [];
-      p.push(0);
-      p.push(0);
-      p.push(100);
-      await getPoolPrice(p);
+    if (
+      (token0Data &&
+        token1Data &&
+        token0Data.isEth &&
+        (await token1Data.tokenAddress
+          .toString()
+          .toLowerCase()
+          .includes(
+            await props.network.wethAddress.toString().toLowerCase()
+          ))) ||
+      (token0Data &&
+        token1Data &&
+        (await token0Data.tokenAddress
+          .toString()
+          .toLowerCase()
+          .includes(
+            await props.network.wethAddress.toString().toLowerCase()
+          )) &&
+        token1Data.isEth)
+    ) {
     } else {
-      if (amount > 0) {
-        const quote = await quoteAddLiquidity(
-          t0.tokenAddress,
-          t1.tokenAddress,
-          amount,
-          isAmountBGiven,
-          props.network.factory
-        );
-
-        if (quote.length > 0) {
-          await getInput1(Number(quote[1]));
-          let p = [];
-          p.push(reserves[1] / reserves[0]);
-          p.push(reserves[0] / reserves[1]);
-          const pair = await getPairAddress(
-            t0.tokenAddress,
-            t1.tokenAddress,
+      await setFetching(true);
+      const reserves = await fetchReserves(
+        t0.isEth ? props.network.wethAddress : t0.tokenAddress,
+        t1.isEth ? props.network.wethAddress : t1.tokenAddress,
+        props.network.factory
+      );
+      if (reserves[0] === 0 && reserves[1] === 0) {
+        let p = [];
+        p.push(0);
+        p.push(0);
+        p.push(100);
+        await getPoolPrice(p);
+      } else {
+        if (amount > 0) {
+          const quote = await quoteAddLiquidity(
+            t0.isEth ? props.network.wethAddress : t0.tokenAddress,
+            t1.isEth ? props.network.wethAddress : t1.tokenAddress,
+            amount,
+            isAmountBGiven,
             props.network.factory
           );
-          if (pair) {
-            const pairContract = await getpairContract(pair);
-            const _totalSupply =
-              Number(await pairContract.methods.totalSupply().call()) *
-              10 ** -Number(await pairContract.methods.decimals().call());
-            let liqPercent =
-              (Number(quote[2]) / (Number(_totalSupply) + Number(quote[2]))) *
-              100;
-            p.push(Number(liqPercent));
+
+          if (quote.length > 0) {
+            await getInput1(Number(quote[1]));
+            let p = [];
+            p.push(reserves[1] / reserves[0]);
+            p.push(reserves[0] / reserves[1]);
+            const pair = await getPairAddress(
+              t0.isEth ? props.network.wethAddress : t0.tokenAddress,
+              t1.isEth ? props.network.wethAddress : t1.tokenAddress,
+              props.network.factory
+            );
+            if (pair) {
+              const pairContract = await getpairContract(pair);
+              const _totalSupply =
+                Number(await pairContract.methods.totalSupply().call()) *
+                10 ** -Number(await pairContract.methods.decimals().call());
+              let liqPercent =
+                (Number(quote[2]) / (Number(_totalSupply) + Number(quote[2]))) *
+                100;
+              p.push(Number(liqPercent));
+            }
+            //console.log(" from " + p[2]);
+            await getPoolPrice(p);
           }
-          //console.log(" from " + p[2]);
-          await getPoolPrice(p);
         }
       }
+      await setFetching(false);
     }
   }
   useEffect(() => {
@@ -466,7 +528,9 @@ const AddLiquidityPage = (props) => {
         setToken1ApprovedStatus(0);
         async function chechAlreadyToken0Approved() {
           let p = await isTokenAlreadyApproved(
-            token0Data.tokenAddress,
+            token0Data.isEth
+              ? props.network.wethAddress
+              : token0Data.tokenAddress,
             input0,
             user.account,
             props.network.router._address
@@ -475,7 +539,9 @@ const AddLiquidityPage = (props) => {
         }
         async function chechAlreadyToken1Approved() {
           let p = await isTokenAlreadyApproved(
-            token1Data.tokenAddress,
+            token1Data.isEth
+              ? props.network.wethAddress
+              : token1Data.tokenAddress,
             input1,
             user.account,
             props.network.router._address
@@ -507,6 +573,7 @@ const AddLiquidityPage = (props) => {
     token0Data: token0Data,
     token1Data: token1Data,
     sendInputAmount0: getInput0,
+    sendFetchingStatus: setFetching,
     amount0: input0,
     sendInputAmount1: getInput1,
     isAddLiquidityOn: true,
@@ -517,6 +584,7 @@ const AddLiquidityPage = (props) => {
     token0Data: token0Data,
     token1Data: token1Data,
     sendInputAmount0: getInput0,
+    sendFetchingStatus: setFetching,
     amount1: input1,
     sendInputAmount1: getInput1,
     isAddLiquidityOn: true,
@@ -532,95 +600,107 @@ const AddLiquidityPage = (props) => {
     isopen: isConfirmTransactionModal,
     poolPrice: poolPrice,
     func: addYourLiquidity,
-    isDisable:
-      // eth + token
+    isDisable: isFetching
+      ? true
+      : // eth + token
+
       token0Data &&
-      token0Data.tokenAddress.toString().toLowerCase() ===
-        props.network.wethAddress.toString().toLowerCase() &&
-      isAlreadyToken1Approved &&
-      !isAddLiquidityButtonClicked
-        ? false
-        : token0Data &&
-          token0Data.tokenAddress.toString().toLowerCase() ===
-            props.network.wethAddress.toString().toLowerCase() &&
-          isAlreadyToken1Approved &&
-          isAddLiquidityButtonClicked
-        ? true
-        : // if already not approved
-        token0Data &&
-          token0Data.tokenAddress.toString().toLowerCase() ===
-            props.network.wethAddress.toString().toLowerCase() &&
-          token1ApprovedStatus !== 2
-        ? true
-        : token0Data &&
-          token0Data.tokenAddress.toString().toLowerCase() ===
-            props.network.wethAddress.toString().toLowerCase() &&
-          token1ApprovedStatus === 2 &&
-          !isAddLiquidityButtonClicked
-        ? false
-        : token0Data &&
-          token0Data.tokenAddress.toString().toLowerCase() ===
-            props.network.wethAddress.toString().toLowerCase() &&
-          token1ApprovedStatus === 2 &&
-          isAddLiquidityButtonClicked
-        ? true
-        : // token + eth
+        token0Data.isEth &&
+        // token0Data.tokenAddress.toString().toLowerCase() ===
+        //   props.network.wethAddress.toString().toLowerCase() &&
+        isAlreadyToken1Approved &&
+        !isAddLiquidityButtonClicked
+      ? false
+      : token0Data &&
+        token0Data.isEth &&
+        // token0Data.tokenAddress.toString().toLowerCase() ===
+        //   props.network.wethAddress.toString().toLowerCase() &&
+        isAlreadyToken1Approved &&
+        isAddLiquidityButtonClicked
+      ? true
+      : // if already not approved
+      token0Data &&
+        token0Data.isEth &&
+        // token0Data.tokenAddress.toString().toLowerCase() ===
+        //   props.network.wethAddress.toString().toLowerCase() &&
+        token1ApprovedStatus !== 2
+      ? true
+      : token0Data &&
+        token0Data.isEth &&
+        // token0Data.tokenAddress.toString().toLowerCase() ===
+        //   props.network.wethAddress.toString().toLowerCase() &&
+        token1ApprovedStatus === 2 &&
+        !isAddLiquidityButtonClicked
+      ? false
+      : token0Data &&
+        token0Data.isEth &&
+        // token0Data.tokenAddress.toString().toLowerCase() ===
+        //   props.network.wethAddress.toString().toLowerCase() &&
+        token1ApprovedStatus === 2 &&
+        isAddLiquidityButtonClicked
+      ? true
+      : // token + eth
 
-        token1Data &&
-          token1Data.tokenAddress.toString().toLowerCase() ===
-            props.network.wethAddress.toString().toLowerCase() &&
-          isAlreadyToken0Approved &&
-          !isAddLiquidityButtonClicked
-        ? false
-        : token1Data &&
-          token1Data.tokenAddress.toString().toLowerCase() ===
-            props.network.wethAddress.toString().toLowerCase() &&
-          isAlreadyToken0Approved &&
-          isAddLiquidityButtonClicked
-        ? true
-        : // if already not approved
-        token1Data &&
-          token1Data.tokenAddress.toString().toLowerCase() ===
-            props.network.wethAddress.toString().toLowerCase() &&
-          token0ApprovedStatus !== 2
-        ? true
-        : token1Data &&
-          token1Data.tokenAddress.toString().toLowerCase() ===
-            props.network.wethAddress.toString().toLowerCase() &&
-          token0ApprovedStatus === 2 &&
-          !isAddLiquidityButtonClicked
-        ? false
-        : token1Data &&
-          token1Data.tokenAddress.toString().toLowerCase() ===
-            props.network.wethAddress.toString().toLowerCase() &&
-          token0ApprovedStatus === 2 &&
-          isAddLiquidityButtonClicked
-        ? true
-        : // token + token
-
+      token1Data &&
+        token1Data.isEth &&
+        // token1Data.tokenAddress.toString().toLowerCase() ===
+        //   props.network.wethAddress.toString().toLowerCase() &&
         isAlreadyToken0Approved &&
-          isAlreadyToken1Approved &&
-          !isAddLiquidityButtonClicked
-        ? false
-        : isAlreadyToken0Approved && token1ApprovedStatus !== 2
-        ? true
-        : token0ApprovedStatus !== 2 && isAlreadyToken1Approved
-        ? true
-        : token0ApprovedStatus !== 2 && token1ApprovedStatus !== 2
-        ? true
-        : token0ApprovedStatus === 2 && token1ApprovedStatus !== 2
-        ? true
-        : token0ApprovedStatus !== 2 && token1ApprovedStatus === 2
-        ? true
-        : token0ApprovedStatus === 2 &&
-          token1ApprovedStatus === 2 &&
-          !isAddLiquidityButtonClicked
-        ? false
-        : token0ApprovedStatus === 2 &&
-          token1ApprovedStatus === 2 &&
-          isAddLiquidityButtonClicked
-        ? true
-        : true,
+        !isAddLiquidityButtonClicked
+      ? false
+      : token1Data &&
+        token1Data.isEth &&
+        // token1Data.tokenAddress.toString().toLowerCase() ===
+        //   props.network.wethAddress.toString().toLowerCase() &&
+        isAlreadyToken0Approved &&
+        isAddLiquidityButtonClicked
+      ? true
+      : // if already not approved
+      token1Data &&
+        token1Data.isEth &&
+        // token1Data.tokenAddress.toString().toLowerCase() ===
+        //   props.network.wethAddress.toString().toLowerCase() &&
+        token0ApprovedStatus !== 2
+      ? true
+      : token1Data &&
+        token1Data.isEth &&
+        // token1Data.tokenAddress.toString().toLowerCase() ===
+        //   props.network.wethAddress.toString().toLowerCase() &&
+        token0ApprovedStatus === 2 &&
+        !isAddLiquidityButtonClicked
+      ? false
+      : token1Data &&
+        token1Data.isEth &&
+        // token1Data.tokenAddress.toString().toLowerCase() ===
+        //   props.network.wethAddress.toString().toLowerCase() &&
+        token0ApprovedStatus === 2 &&
+        isAddLiquidityButtonClicked
+      ? true
+      : // token + token
+
+      isAlreadyToken0Approved &&
+        isAlreadyToken1Approved &&
+        !isAddLiquidityButtonClicked
+      ? false
+      : isAlreadyToken0Approved && token1ApprovedStatus !== 2
+      ? true
+      : token0ApprovedStatus !== 2 && isAlreadyToken1Approved
+      ? true
+      : token0ApprovedStatus !== 2 && token1ApprovedStatus !== 2
+      ? true
+      : token0ApprovedStatus === 2 && token1ApprovedStatus !== 2
+      ? true
+      : token0ApprovedStatus !== 2 && token1ApprovedStatus === 2
+      ? true
+      : token0ApprovedStatus === 2 &&
+        token1ApprovedStatus === 2 &&
+        !isAddLiquidityButtonClicked
+      ? false
+      : token0ApprovedStatus === 2 &&
+        token1ApprovedStatus === 2 &&
+        isAddLiquidityButtonClicked
+      ? true
+      : true,
     transactionHashData: transactionHashData,
     network: props.network,
     isAddLiquidityTransaction: true,
@@ -678,7 +758,22 @@ const AddLiquidityPage = (props) => {
             network={props.network}
           />
 
-          {token0Data && token1Data ? (
+          {isFetching ? <FontSizeLoader text="fetching price..." /> : null}
+
+          {(token0Data &&
+            token1Data &&
+            token0Data.isEth &&
+            token1Data.tokenAddress
+              .toString()
+              .toLowerCase()
+              .includes(props.network.wethAddress.toString().toLowerCase())) ||
+          (token0Data &&
+            token1Data &&
+            token0Data.tokenAddress
+              .toString()
+              .toLowerCase()
+              .includes(props.network.wethAddress.toString().toLowerCase()) &&
+            token1Data.isEth) ? null : token0Data && token1Data ? (
             <div className={styles.box}>
               <p className={styles.item1Left}>Prices and pool share</p>
 
@@ -696,7 +791,12 @@ const AddLiquidityPage = (props) => {
                   </p>
                   <p>
                     {poolPrice.length > 2 ? ( //error may occur
-                      <span>{Number(poolPrice[2]).toFixed(4)}%</span>
+                      <span>
+                        {Number(poolPrice[2]).toFixed(4) > 0.0001
+                          ? Number(poolPrice[2]).toFixed(4)
+                          : "<0.0001"}
+                        %
+                      </span>
                     ) : null}
                   </p>
                 </div>
@@ -717,8 +817,9 @@ const AddLiquidityPage = (props) => {
 
           {isAuthenticated &&
           token0Data &&
-          token0Data.tokenAddress.toString().toLowerCase() !==
-            props.network.wethAddress.toString().toLowerCase() &&
+          !token0Data.isEth &&
+          // token0Data.tokenAddress.toString().toLowerCase() !==
+          //   props.network.wethAddress.toString().toLowerCase() &&
           token1Data &&
           input0 &&
           input0 > 0 &&
@@ -751,8 +852,9 @@ const AddLiquidityPage = (props) => {
           {isAuthenticated &&
           token0Data &&
           token1Data &&
-          token1Data.tokenAddress.toString().toLowerCase() !==
-            props.network.wethAddress.toString().toLowerCase() &&
+          !token1Data.isEth &&
+          // token1Data.tokenAddress.toString().toLowerCase() !==
+          //   props.network.wethAddress.toString().toLowerCase() &&
           input0 &&
           input0 > 0 &&
           input0 <= token0Data.balance &&
@@ -789,6 +891,27 @@ const AddLiquidityPage = (props) => {
                 <SelectATokenButton />
               ) : !token1Data ? (
                 <SelectATokenButton />
+              ) : token0Data.tokenAddress === token1Data.tokenAddress ? (
+                <DynamicButton text="Invalid Pair" isDisable={true} />
+              ) : (token0Data &&
+                  token1Data &&
+                  token0Data.isEth &&
+                  token1Data.tokenAddress
+                    .toString()
+                    .toLowerCase()
+                    .includes(
+                      props.network.wethAddress.toString().toLowerCase()
+                    )) ||
+                (token0Data &&
+                  token1Data &&
+                  token0Data.tokenAddress
+                    .toString()
+                    .toLowerCase()
+                    .includes(
+                      props.network.wethAddress.toString().toLowerCase()
+                    ) &&
+                  token1Data.isEth) ? (
+                <DynamicButton text="Invalid Pair" isDisable={true} />
               ) : !input0 ? (
                 <AmountButton />
               ) : !input1 ? (
@@ -803,56 +926,67 @@ const AddLiquidityPage = (props) => {
                 <AddLiquidityButton
                   add={confirmTransactionModalToggle}
                   isDisable={
-                    // eth + token
-                    token0Data.tokenAddress.toString().toLowerCase() ===
-                      props.network.wethAddress.toString().toLowerCase() &&
-                    isAlreadyToken1Approved &&
-                    !isAddLiquidityButtonClicked
+                    isFetching
+                      ? true
+                      : // eth + token
+                      token0Data.isEth &&
+                        // token0Data.tokenAddress.toString().toLowerCase() ===
+                        //   props.network.wethAddress.toString().toLowerCase() &&
+                        isAlreadyToken1Approved &&
+                        !isAddLiquidityButtonClicked
                       ? false
-                      : token0Data.tokenAddress.toString().toLowerCase() ===
-                          props.network.wethAddress.toString().toLowerCase() &&
+                      : token0Data.isEth &&
+                        // token0Data.tokenAddress.toString().toLowerCase() ===
+                        //     props.network.wethAddress.toString().toLowerCase() &&
                         isAlreadyToken1Approved &&
                         isAddLiquidityButtonClicked
                       ? true
                       : // if already not approved
-                      token0Data.tokenAddress.toString().toLowerCase() ===
-                          props.network.wethAddress.toString().toLowerCase() &&
+                      token0Data.isEth &&
+                        // token0Data.tokenAddress.toString().toLowerCase() ===
+                        //     props.network.wethAddress.toString().toLowerCase() &&
                         token1ApprovedStatus !== 2
                       ? true
-                      : token0Data.tokenAddress.toString().toLowerCase() ===
-                          props.network.wethAddress.toString().toLowerCase() &&
+                      : token0Data.isEth &&
+                        // token0Data.tokenAddress.toString().toLowerCase() ===
+                        //     props.network.wethAddress.toString().toLowerCase() &&
                         token1ApprovedStatus === 2 &&
                         !isAddLiquidityButtonClicked
                       ? false
-                      : token0Data.tokenAddress.toString().toLowerCase() ===
-                          props.network.wethAddress.toString().toLowerCase() &&
+                      : token0Data.isEth &&
+                        // token0Data.tokenAddress.toString().toLowerCase() ===
+                        //     props.network.wethAddress.toString().toLowerCase() &&
                         token1ApprovedStatus === 2 &&
                         isAddLiquidityButtonClicked
                       ? true
                       : // token + eth
-
-                      token1Data.tokenAddress.toString().toLowerCase() ===
-                          props.network.wethAddress.toString().toLowerCase() &&
+                      token1Data.isEth &&
+                        // token1Data.tokenAddress.toString().toLowerCase() ===
+                        //     props.network.wethAddress.toString().toLowerCase() &&
                         isAlreadyToken0Approved &&
                         !isAddLiquidityButtonClicked
                       ? false
-                      : token1Data.tokenAddress.toString().toLowerCase() ===
-                          props.network.wethAddress.toString().toLowerCase() &&
+                      : token1Data.isEth &&
+                        // token1Data.tokenAddress.toString().toLowerCase() ===
+                        //     props.network.wethAddress.toString().toLowerCase() &&
                         isAlreadyToken0Approved &&
                         isAddLiquidityButtonClicked
                       ? true
                       : // if already not approved
-                      token1Data.tokenAddress.toString().toLowerCase() ===
-                          props.network.wethAddress.toString().toLowerCase() &&
+                      token1Data.isEth &&
+                        // token1Data.tokenAddress.toString().toLowerCase() ===
+                        //     props.network.wethAddress.toString().toLowerCase() &&
                         token0ApprovedStatus !== 2
                       ? true
-                      : token1Data.tokenAddress.toString().toLowerCase() ===
-                          props.network.wethAddress.toString().toLowerCase() &&
+                      : token1Data.isEth &&
+                        // token1Data.tokenAddress.toString().toLowerCase() ===
+                        //     props.network.wethAddress.toString().toLowerCase() &&
                         token0ApprovedStatus === 2 &&
                         !isAddLiquidityButtonClicked
                       ? false
-                      : token1Data.tokenAddress.toString().toLowerCase() ===
-                          props.network.wethAddress.toString().toLowerCase() &&
+                      : token1Data.isEth &&
+                        // token1Data.tokenAddress.toString().toLowerCase() ===
+                        //     props.network.wethAddress.toString().toLowerCase() &&
                         token0ApprovedStatus === 2 &&
                         isAddLiquidityButtonClicked
                       ? true

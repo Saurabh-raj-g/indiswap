@@ -6,6 +6,7 @@ const ROUTER = require("../contracts/UniswapV2Router02.json");
 const ERC20 = require("../contracts/IERC20.json");
 const FACTORY = require("../contracts/UniswapV2Factory.json");
 const PAIR = require("../contracts/UniswapV2Pair.json");
+const IWETH = require("../contracts/IWETH.json");
 import * as chains from "../constants/chains.js";
 const web3 = new Web3(window.ethereum);
 
@@ -148,6 +149,14 @@ export const getFactory = async (contractAddress) => {
   }
 };
 
+export const getWethContract = async (contractAddress) => {
+  try {
+    return new web3.eth.Contract(IWETH.abi, contractAddress);
+  } catch (error) {
+    return;
+  }
+};
+
 export const getWeth = async (contractAddress) => {
   try {
     return new web3.eth.Contract(ERC20.abi, contractAddress);
@@ -167,7 +176,7 @@ export const getTokenContract = async (contractAddress) => {
   try {
     return new web3.eth.Contract(ERC20.abi, contractAddress);
   } catch (error) {
-    alert("Failed to load token contract ");
+    //alert("Failed to load token contract ");
     return false;
   }
 };
@@ -249,33 +258,52 @@ export const getpairContract = async (contractAddress) => {
   }
 };
 
+//export const getEthData = async (tokenAddress, wethAddress, chainId) => {
 export const getTokenData = async (tokenAddress, wethAddress, chainId) => {
   try {
     // const link = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${tokenAddress}/logo.png`;
     // const img = await axios.get(
     //   `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x71F239DBb135Ccf3C9cDC2cEa711062F5070c978/logo.png`
     // );
-    const token = await getTokenContract(tokenAddress);
-    if (
-      (await tokenAddress.toString().toLowerCase()) ===
-      (await wethAddress.toString().toLowerCase())
-    ) {
-      if (token) {
-        return {
-          symbol:
-            (await chainId) === 56 || (await chainId) === 97 ? "BNB" : "ETH",
-          name:
-            (await chainId) === 56 || (await chainId) === 97
-              ? "Binance chain native token"
-              : "ether",
-          decimals: 18,
-          tokenAddress: wethAddress,
-        };
-      } else if (!token) {
-        alert("Token does not exists");
-        return;
-      }
+
+    if (tokenAddress.includes("eth")) {
+      return {
+        symbol: "ETH",
+        name: "ether",
+        isEth: true,
+        decimals: 18,
+        tokenAddress: tokenAddress,
+      };
     }
+    if (tokenAddress.includes("bnb")) {
+      return {
+        symbol: "BNB",
+        name: "Binance chain native token",
+        decimals: 18,
+        isEth: true,
+        tokenAddress: tokenAddress,
+      };
+    }
+    const token = await getTokenContract(tokenAddress);
+    // if (
+    //   (await tokenAddress.toString().toLowerCase().includes(await wethAddress.toString().toLowerCase()))
+    //  ) {
+    //   if (token) {
+    //     return {
+    //       symbol:
+    //         (await chainId) === 56 || (await chainId) === 97 ? "BNB" : "ETH",
+    //       name:
+    //         (await chainId) === 56 || (await chainId) === 97
+    //           ? "Binance chain native token"
+    //           : "ether",
+    //       decimals: 18,
+    //       tokenAddress: wethAddress,
+    //     };
+    //   } else if (!token) {
+    //     alert("Token does not exists");
+    //     return;
+    //   }
+    // }
 
     if (token) {
       return {
@@ -290,6 +318,7 @@ export const getTokenData = async (tokenAddress, wethAddress, chainId) => {
     }
   } catch (error) {
     //alert("Failed to load your token data");
+    return;
   }
 };
 
@@ -304,37 +333,67 @@ export const getTokenDataWithBalance = async (
     // const img = await axios.get(
     //   `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x71F239DBb135Ccf3C9cDC2cEa711062F5070c978/logo.png`
     // );
-    const token = await getTokenContract(tokenAddress);
-    if (
-      (await tokenAddress.toString().toLowerCase()) ===
-      (await wethAddress.toString().toLowerCase())
-    ) {
-      if (token) {
-        const t = new ethers.providers.Web3Provider(window.ethereum);
-        const bal = (await t.getBalance(account.toString())) * 10 ** -18;
-        return {
-          balance: bal,
-          symbol:
-            (await chainId) === 56 || (await chainId) === 97 ? "BNB" : "ETH",
-          name:
-            (await chainId) === 56 || (await chainId) === 97
-              ? "Binance chain native token"
-              : "ether",
-          decimals: 18,
-          tokenAddress: wethAddress,
-        };
-      } else if (!token) {
-        alert("Token does not exists");
-        return;
-      }
+
+    if (tokenAddress.includes("eth")) {
+      const t = new ethers.providers.Web3Provider(window.ethereum);
+      const bal = (await t.getBalance(account.toString())) * 10 ** -18;
+      return {
+        balance: bal,
+        symbol: "ETH",
+        name: "ether",
+        decimals: 18,
+        isEth: true,
+        tokenAddress: tokenAddress,
+      };
     }
+    if (tokenAddress.includes("bnb")) {
+      const t = new ethers.providers.Web3Provider(window.ethereum);
+      const bal = (await t.getBalance(account.toString())) * 10 ** -18;
+      return {
+        balance: bal,
+        symbol: "BNB",
+        name: "Binance chain native token",
+        decimals: 18,
+        isEth: true,
+        tokenAddress: tokenAddress,
+      };
+    }
+    const token = await getTokenContract(tokenAddress);
+    // console.log([await wethAddress.toLowerCase()]);
+    // if (
+    //   await tokenAddress
+    //     .toString()
+    //     .toLowerCase()
+    //     .includes(await wethAddress.toString().toLowerCase())
+    // ) {
+    //   if (token) {
+    //     const t = new ethers.providers.Web3Provider(window.ethereum);
+    //     const bal = (await t.getBalance(account.toString())) * 10 ** -18;
+    //     return {
+    //       balance: bal,
+    //       symbol:
+    //         (await chainId) === 56 || (await chainId) === 97 ? "BNB" : "ETH",
+    //       name:
+    //         (await chainId) === 56 || (await chainId) === 97
+    //           ? "Binance chain native token"
+    //           : "ether",
+    //       // symbol: await token.methods.symbol().call(),
+    //       // name: await token.methods.name().call(),
+    //       decimals: 18,
+    //       tokenAddress: wethAddress,
+    //     };
+    //   } else if (!token) {
+    //     alert("Token does not exists");
+    //     return;
+    //   }
+    // }
 
     if (token) {
+      let ba =
+        Number(await token.methods.balanceOf(account).call()) *
+        10 ** -Number(await token.methods.decimals().call());
       return {
-        balance:
-          Number(await token.methods.balanceOf(account).call()) *
-          10 ** -Number(await token.methods.decimals().call()),
-
+        balance: ba,
         symbol: await token.methods.symbol().call(),
         name: await token.methods.name().call(),
         decimals: await token.methods.decimals().call(),
@@ -371,6 +430,7 @@ export async function getDataForPairs(
     const liquidity =
       (await pairContract.methods.balanceOf(account).call()) *
       10 ** -(await pairContract.methods.decimals().call());
+
     let token0Data = await getTokenDataWithBalance(
       token0Address,
       wethAddress,
@@ -445,7 +505,7 @@ export async function isTokenAlreadyApproved(
         return false;
       }
     } else {
-      alert("Token doesn't exist\nMake sure connected to Goerli network");
+      // alert("Token doesn't exist\nMake sure connected to Goerli network");
       return false;
     }
   } catch (err) {
@@ -548,8 +608,10 @@ export async function sendToken(
 ) {
   try {
     if (
-      (await tokenAddress.toString().toLowerCase()) ===
-      (await wethAddress.toString().toLowerCase())
+      (await tokenAddress.toString().includes("eth")) ||
+      (await tokenAddress.toString().includes("bnb"))
+      // (await tokenAddress.toString().toLowerCase()) ===
+      // (await wethAddress.toString().toLowerCase())
     ) {
       const amt = await toWei(amount, 18); // web3.utils.toWei(String(amount), "ether");
       const t = new ethers.providers.Web3Provider(window.ethereum);
@@ -560,7 +622,9 @@ export async function sendToken(
         to: recipient,
         value: amt,
       };
-      let k = signer.sendTransaction(tx);
+
+      let k = await signer.sendTransaction(tx);
+
       return [await k.status, await k.transactionHash];
     } else {
       const token = await getTokenContract(tokenAddress);
@@ -601,19 +665,68 @@ export async function swap(
 ) {
   try {
     //let routerAddress = await routerContract.address;
+    //console.log(path[0].toString());
+    if (
+      (path[0].toString() === "eth" || path[0].toString() === "bnb") &&
+      (await path[path.length - 1].toString().toLowerCase()) ===
+        (await wethAddress.toString().toLowerCase())
+    ) {
+      const amt = await toWei(String(amount), 18);
 
-    const token0 = await getTokenContract(path[0]);
-    const OutputToken = await getTokenContract(path[path.length - 1]);
+      let weth = await getWethContract(wethAddress);
+
+      let k = await weth.methods.deposit().send({ from: account, value: amt });
+      // if (await k.status) {
+      //   let pt = await weth.methods
+      //     .transfer(account, amt)
+      //     .send({ from: wethAddress });
+      //   return [await pt.status, await pt.transactionHash];
+      // } else {
+      return [await k.status, await k.transactionHash];
+      // }
+    } else if (
+      (path[path.length - 1].toString() === "eth" ||
+        path[path.length - 1].toString() === "bnb") &&
+      (await path[0].toString().toLowerCase()) ===
+        (await wethAddress.toString().toLowerCase())
+    ) {
+      const amt = await toWei(String(amount), 18);
+      let weth = await getWethContract(wethAddress);
+
+      let k = await weth.methods.withdraw(amt).send({ from: account });
+
+      return [await k.status, await k.transactionHash];
+    }
+    let token0;
+    let OutputToken;
+    let amountIn;
+
+    if (
+      (await path[0].toString()) === "eth" ||
+      (await path[0].toString()) === "bnb"
+    ) {
+      amountIn = await toWei(amount, 18);
+    } else {
+      token0 = await getTokenContract(path[0]);
+      amountIn = await toWei(amount, await token0.methods.decimals().call());
+    }
+
+    if (
+      (await path[path.length - 1].toString()) === "eth" ||
+      (await path[path.length - 1].toString()) === "bnb"
+    ) {
+      amountOut = await calSlippage(amountOut, 18, slippage);
+    } else {
+      OutputToken = await getTokenContract(path[path.length - 1]);
+      amountOut = await calSlippage(
+        amountOut,
+        await OutputToken.methods.decimals().call(),
+        slippage
+      );
+    }
+
     //const routerContract = await getRouter(routerAddress);
     // const wethAddress = await getWeth();
-
-    let amountIn = await toWei(amount, await token0.methods.decimals().call());
-
-    amountOut = await calSlippage(
-      amountOut,
-      await OutputToken.methods.decimals().call(),
-      slippage
-    );
 
     // amountOut = amountOut[amountOut.length - 1] * (1 - slippage * 0.01);
     // amountOut = amountOut.toString(); //* 0.995; //10 ** -18;
@@ -626,32 +739,34 @@ export async function swap(
     deadline = ethers.BigNumber.from(
       Math.floor(Date.now() / 1000) + Number(deadline) * 60 * 1000
     );
-
     if (
-      wethAddress &&
-      (await path[0].toString().toLowerCase()) ===
-        (await wethAddress.toString().toLowerCase())
+      (await path[0].toString()) === "eth" ||
+      (await path[0].toString()) === "bnb"
     ) {
-      //console.log(path);
-      //console.log([amountOut, path, account, deadline.toString(), amountIn]);
-
+      //console.log("dss");
+      let pathh = [...path];
+      pathh[0] = wethAddress;
       let k = await routerContract.methods
-        .swapExactETHForTokens(amountOut, path, account, deadline)
+        .swapExactETHForTokens(amountOut, pathh, account, deadline)
         .send({ from: account, value: amountIn });
 
       return [await k.status, await k.transactionHash];
     } else if (
-      wethAddress &&
       (await path[path.length - 1].toString().toLowerCase()) ===
-        (await wethAddress.toString().toLowerCase())
+        (await wethAddress.toString().toLowerCase()) ||
+      (await path[path.length - 1].toString()) === "eth" ||
+      (await path[path.length - 1].toString()) === "bnb"
     ) {
+      // console.log("dss");
+      let pathh = [...path];
+      pathh[pathh.length - 1] = wethAddress;
       let k = await routerContract.methods
-        .swapExactTokensForETH(amountIn, amountOut, path, account, deadline)
+        .swapExactTokensForETH(amountIn, amountOut, pathh, account, deadline)
         .send({ from: account });
 
-      // console.log(await k.status);
       return [await k.status, await k.transactionHash];
     } else {
+      //console.log("dss");
       let k = await routerContract.methods
         .swapExactTokensForTokens(amountIn, amountOut, path, account, deadline)
         .send({ from: account });
@@ -659,6 +774,36 @@ export async function swap(
       //console.log(await k.status);
       return [await k.status, await k.transactionHash];
     }
+
+    // if (
+    //   wethAddress &&
+    //   (await path[0].toString().toLowerCase()) ===
+    //     (await wethAddress.toString().toLowerCase())
+    // ) {
+    //   let k = await routerContract.methods
+    //     .swapExactETHForTokens(amountOut, path, account, deadline)
+    //     .send({ from: account, value: amountIn });
+
+    //   return [await k.status, await k.transactionHash];
+    // } else if (
+    //   wethAddress &&
+    //   (await path[path.length - 1].toString().toLowerCase()) ===
+    //     (await wethAddress.toString().toLowerCase())
+    // ) {
+    //   let k = await routerContract.methods
+    //     .swapExactTokensForETH(amountIn, amountOut, path, account, deadline)
+    //     .send({ from: account });
+
+    //   // console.log(await k.status);
+    //   return [await k.status, await k.transactionHash];
+    // } else {
+    //   let k = await routerContract.methods
+    //     .swapExactTokensForTokens(amountIn, amountOut, path, account, deadline)
+    //     .send({ from: account });
+
+    //   //console.log(await k.status);
+    //   return [await k.status, await k.transactionHash];
+    // }
   } catch (err) {
     //alert(err);
     //alert("An error occured while swapping the token");
@@ -683,38 +828,95 @@ export async function addLiquidity(
 
     //const routerContract = await getRouter(routerAddress);
     // const wethAddress = await getWeth();
+    //console.log("vb");
+    let token0;
+    let token1;
+    let amountIn0;
+    let amountIn1;
+    let amount0Min = (await amount0) * (1 - slippage * 0.01);
+    let amount1Min = (await amount1) * (1 - slippage * 0.01);
 
-    const token0 = await getTokenContract(token0Address);
-    const token1 = await getTokenContract(token1Address);
+    if (
+      token0Address.toString() === "eth" ||
+      token0Address.toString() === "bnb"
+    ) {
+      token0 = true;
+      amountIn0 = await toWei(amount0, 18);
+      amount0Min = await toWei(amount0Min, 18);
+    }
 
+    if (
+      token1Address.toString() === "eth" ||
+      token1Address.toString() === "bnb"
+    ) {
+      token1 = true;
+      amountIn1 = await toWei(amount1, 18);
+      amount1Min = await toWei(amount1Min, 18);
+    }
+
+    if (
+      token0Address.toString() !== "eth" &&
+      token0Address.toString() !== "bnb"
+    ) {
+      token0 = await getTokenContract(token0Address);
+      if (token0) {
+        amountIn0 = await toWei(
+          amount0,
+          await token0.methods.decimals().call()
+        );
+
+        amount0Min = await toWei(
+          amount0Min,
+          await token0.methods.decimals().call()
+        );
+      }
+    }
+
+    if (
+      token1Address.toString() !== "eth" &&
+      token1Address.toString() !== "bnb"
+    ) {
+      token1 = await getTokenContract(token1Address);
+      if (token1) {
+        amountIn1 = await toWei(
+          amount1,
+          await token1.methods.decimals().call()
+        );
+        amount1Min = await toWei(
+          amount1Min,
+          await token1.methods.decimals().call()
+        );
+      }
+    }
+    // console.log("vb");
     if (token0 && token1) {
-      const amountIn0 = await toWei(
-        amount0,
-        await token0.methods.decimals().call()
-      );
-      const amountIn1 = await toWei(
-        amount1,
-        await token1.methods.decimals().call()
-      );
+      // const amountIn0 = await toWei(
+      //   amount0,
+      //   await token0.methods.decimals().call()
+      // );
+      // const amountIn1 = await toWei(
+      //   amount1,
+      //   await token1.methods.decimals().call()
+      // );
 
-      let amount0Min = (await amount0) * (1 - slippage * 0.01);
-      let amount1Min = (await amount1) * (1 - slippage * 0.01);
-      amount0Min = await toWei(
-        amount0Min,
-        await token0.methods.decimals().call()
-      );
-      amount1Min = await toWei(
-        amount1Min,
-        await token1.methods.decimals().call()
-      );
+      // let amount0Min = (await amount0) * (1 - slippage * 0.01);
+      // let amount1Min = (await amount1) * (1 - slippage * 0.01);
+      // amount0Min = await toWei(
+      //   amount0Min,
+      //   await token0.methods.decimals().call()
+      // );
+      // amount1Min = await toWei(
+      //   amount1Min,
+      //   await token1.methods.decimals().call()
+      // );
 
       deadline = ethers.BigNumber.from(
         Math.floor(Date.now() / 1000) + Number(deadline) * 60 * 1000
       );
 
       if (
-        (await token0Address.toString().toLowerCase()) ===
-        (await wethAddress.toString().toLowerCase())
+        token0Address.toString() === "eth" ||
+        token0Address.toString() === "bnb"
       ) {
         // Eth + Token
         let k = await routerContract.methods
@@ -728,9 +930,15 @@ export async function addLiquidity(
           )
           .send({ value: amountIn0, from: account });
         return [await k.status, await k.transactionHash];
-      } else if (
-        (await token1Address.toString().toLowerCase()) ===
-        (await wethAddress.toString().toLowerCase())
+      }
+      // if (
+      //   (await token0Address.toString().toLowerCase()) ===
+      //   (await wethAddress.toString().toLowerCase())
+      // ) {
+      // }
+      else if (
+        token1Address.toString() === "eth" ||
+        token1Address.toString() === "bnb"
       ) {
         // Token + Eth
         let k = await routerContract.methods
@@ -745,7 +953,13 @@ export async function addLiquidity(
           .send({ value: amountIn1, from: account });
 
         return [await k.status, await k.transactionHash];
-      } else {
+      }
+      // else if (
+      //   (await token1Address.toString().toLowerCase()) ===
+      //   (await wethAddress.toString().toLowerCase())
+      // ) {
+      // }
+      else {
         let k = await routerContract.methods
           .addLiquidity(
             token0Address,
@@ -1372,27 +1586,102 @@ async function print_paths(adj, start, end) {
   }
 }
 
+// new
+
+export async function printAllRoute(adj, src, target, visited, answer, result) {
+  if (src.toLowerCase().includes(target.toLowerCase())) {
+    //console.log(answer);
+    //console.log("sdj");
+
+    result.push(answer);
+    return;
+  }
+  //console.log(adj[src]);
+
+  visited[src] = true;
+  adj[src].forEach((v) => {
+    if (visited[v] === false || visited[v] === undefined) {
+      //answer.push(v);
+      printAllRoute(adj, v, target, visited, answer + " " + v, result);
+    }
+  });
+  visited[src] = false;
+  // answer = [];
+}
+
+//old
+
+// export async function SmartRoutes(list, src, target) {
+//   var graph = new Graph();
+//   for (let i = 0; i < list.length; i++) {
+//     graph.addEdge(
+//       list[i].token0Data.tokenAddress,
+//       list[i].token1Data.tokenAddress
+//     );
+//   }
+
+//   // graph.addEdge("A", "C");
+//   // graph.addEdge("B", "C");
+//   // // graph.addEdge("D", "M");
+//   // graph.addEdge("B", "D");
+//   // graph.addEdge("D", "A");
+//   // graph.addEdge("C", "E");
+//   // graph.addEdge("E", "F");
+//   // graph.addEdge("F", "B");
+//   // graph.addEdge('E', 'F');
+
+//   let r = await print_paths(graph.neighbors, src, target);
+//   return r;
+
+// }
+
+// new
+//list, src, target
 export async function SmartRoutes(list, src, target) {
   var graph = new Graph();
   for (let i = 0; i < list.length; i++) {
-    graph.addEdge(
-      list[i].token0Data.tokenAddress,
-      list[i].token1Data.tokenAddress
-    );
+    let p1 = await list[i].token0Data.tokenAddress.toString();
+    let p2 = await list[i].token1Data.tokenAddress.toString();
+    graph.addEdge(p1, p2);
   }
-
+  src = await src.toString();
+  target = await target.toString();
+  //console.log(target);
+  // var graph = new Graph();
   // graph.addEdge("A", "C");
   // graph.addEdge("B", "C");
   // // graph.addEdge("D", "M");
   // graph.addEdge("B", "D");
   // graph.addEdge("D", "A");
   // graph.addEdge("C", "E");
-  // graph.addEdge("E", "F");
-  // graph.addEdge("F", "B");
-  // graph.addEdge('E', 'F');
 
-  let r = await print_paths(graph.neighbors, src, target);
-  return r;
+  // graph.addEdge("E", "F");
+  //graph.addEdge("E", "B");
+  // graph.addEdge('E', 'F');
+  // let answer = [];
+  // answer.push("A");
+
+  // let r = await print_paths(graph.neighbors, "A", "B");
+  // console.log(r);
+  //console.log(src);
+  let result = [];
+  // await printAllRoute(graph.neighbors, "A", "C", {}, "A", result);
+  await printAllRoute(graph.neighbors, src, target, {}, src, result);
+  //console.log(result);
+  let answer = [];
+  if (result && result.length > 0) {
+    result.forEach((v) => {
+      let k = String(v).split(" ");
+      //console.log(v);
+      answer.push(k);
+    });
+
+    // console.log(answer);
+    return answer;
+  } else {
+    console.log("answer");
+    return result;
+  }
 }
 
 /*

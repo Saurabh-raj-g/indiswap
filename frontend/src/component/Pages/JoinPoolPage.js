@@ -13,6 +13,7 @@ import SwapBoxFrom from "../layout/Utils/SwapBox/SwapBoxFrom";
 import SwapBoxTo from "../layout/Utils/SwapBox/SwapBoxTo";
 import SwapBoxToggler from "../layout/Utils/SwapBox/SwapBoxToggler";
 
+import FontSizeLoader from ".././layout/Loader/FontSizeLoader.js";
 //import WaitButton from "../layout/Utils/Button/WaitButton";
 import InsufficientBalanceButton from "../layout/Utils/Button/InsufficientBalanceButton";
 import DynamicButton from "../layout/Utils/Button/DynamicButton";
@@ -49,6 +50,8 @@ const JoinPoolPage = (props) => {
   const dispatch = useDispatch();
   const alert = useAlert();
   const [modal, setModal] = useState(false);
+
+  const [isFetching, setIsFetching] = useState(false);
   const [isConfirmTransactionModal, setIsConfirmTransactionModal] =
     useState(false);
   // 0 -> false , 1 -> approving , 2 -> approved , 3 -> anotherIsApproving
@@ -77,6 +80,10 @@ const JoinPoolPage = (props) => {
   const { slippage } = useSelector((state) => state.slippage);
   const { deadline } = useSelector((state) => state.deadline);
   //const { weth } = useSelector((state) => state.weth);
+
+  const setFetching = async (t) => {
+    setIsFetching(t);
+  };
 
   const togglemodal = () => {
     setModal(!modal);
@@ -444,6 +451,7 @@ const JoinPoolPage = (props) => {
     token0Data: token0Data ? token0Data : null,
     token1Data: token1Data ? token1Data : null,
     sendInputAmount0: getInput0,
+    sendFetchingStatus: setFetching,
     amount0: input0,
     sendInputAmount1: getInput1,
     isJoinPoolOn: true,
@@ -454,6 +462,7 @@ const JoinPoolPage = (props) => {
     token0Data: token0Data ? token0Data : null,
     token1Data: token1Data ? token1Data : null,
     sendInputAmount0: getInput0,
+    sendFetchingStatus: setFetching,
     amount1: input1,
     sendInputAmount1: getInput1,
     isJoinPoolOn: true,
@@ -470,95 +479,96 @@ const JoinPoolPage = (props) => {
     isopen: isConfirmTransactionModal,
     poolPrice: poolPrice,
     func: addYourLiquidity,
-    isDisable:
-      // eth + token
+    isDisable: isFetching
+      ? true
+      : // eth + token
       token0Data &&
-      token0Data.tokenAddress.toString().toLowerCase() ===
-        props.network.wethAddress.toString().toLowerCase() &&
-      isAlreadyToken1Approved &&
-      !isAddLiquidityButtonClicked
-        ? false
-        : token0Data &&
-          token0Data.tokenAddress.toString().toLowerCase() ===
-            props.network.wethAddress.toString().toLowerCase() &&
-          isAlreadyToken1Approved &&
-          isAddLiquidityButtonClicked
-        ? true
-        : // if already not approved
-        token0Data &&
-          token0Data.tokenAddress.toString().toLowerCase() ===
-            props.network.wethAddress.toString().toLowerCase() &&
-          token1ApprovedStatus !== 2
-        ? true
-        : token0Data &&
-          token0Data.tokenAddress.toString().toLowerCase() ===
-            props.network.wethAddress.toString().toLowerCase() &&
-          token1ApprovedStatus === 2 &&
-          !isAddLiquidityButtonClicked
-        ? false
-        : token0Data &&
-          token0Data.tokenAddress.toString().toLowerCase() ===
-            props.network.wethAddress.toString().toLowerCase() &&
-          token1ApprovedStatus === 2 &&
-          isAddLiquidityButtonClicked
-        ? true
-        : // token + eth
+        token0Data.tokenAddress.toString().toLowerCase() ===
+          props.network.wethAddress.toString().toLowerCase() &&
+        isAlreadyToken1Approved &&
+        !isAddLiquidityButtonClicked
+      ? false
+      : token0Data &&
+        token0Data.tokenAddress.toString().toLowerCase() ===
+          props.network.wethAddress.toString().toLowerCase() &&
+        isAlreadyToken1Approved &&
+        isAddLiquidityButtonClicked
+      ? true
+      : // if already not approved
+      token0Data &&
+        token0Data.tokenAddress.toString().toLowerCase() ===
+          props.network.wethAddress.toString().toLowerCase() &&
+        token1ApprovedStatus !== 2
+      ? true
+      : token0Data &&
+        token0Data.tokenAddress.toString().toLowerCase() ===
+          props.network.wethAddress.toString().toLowerCase() &&
+        token1ApprovedStatus === 2 &&
+        !isAddLiquidityButtonClicked
+      ? false
+      : token0Data &&
+        token0Data.tokenAddress.toString().toLowerCase() ===
+          props.network.wethAddress.toString().toLowerCase() &&
+        token1ApprovedStatus === 2 &&
+        isAddLiquidityButtonClicked
+      ? true
+      : // token + eth
 
-        token1Data &&
-          token1Data.tokenAddress.toString().toLowerCase() ===
-            props.network.wethAddress.toString().toLowerCase() &&
-          isAlreadyToken0Approved &&
-          !isAddLiquidityButtonClicked
-        ? false
-        : token1Data &&
-          token1Data.tokenAddress.toString().toLowerCase() ===
-            props.network.wethAddress.toString().toLowerCase() &&
-          isAlreadyToken0Approved &&
-          isAddLiquidityButtonClicked
-        ? true
-        : // if already not approved
-        token1Data &&
-          token1Data.tokenAddress.toString().toLowerCase() ===
-            props.network.wethAddress.toString().toLowerCase() &&
-          token0ApprovedStatus !== 2
-        ? true
-        : token1Data &&
-          token1Data.tokenAddress.toString().toLowerCase() ===
-            props.network.wethAddress.toString().toLowerCase() &&
-          token0ApprovedStatus === 2 &&
-          !isAddLiquidityButtonClicked
-        ? false
-        : token1Data &&
-          token1Data.tokenAddress.toString().toLowerCase() ===
-            props.network.wethAddress.toString().toLowerCase() &&
-          token0ApprovedStatus === 2 &&
-          isAddLiquidityButtonClicked
-        ? true
-        : // token + token
-
+      token1Data &&
+        token1Data.tokenAddress.toString().toLowerCase() ===
+          props.network.wethAddress.toString().toLowerCase() &&
         isAlreadyToken0Approved &&
-          isAlreadyToken1Approved &&
-          !isAddLiquidityButtonClicked
-        ? false
-        : isAlreadyToken0Approved && token1ApprovedStatus !== 2
-        ? true
-        : token0ApprovedStatus !== 2 && isAlreadyToken1Approved
-        ? true
-        : token0ApprovedStatus !== 2 && token1ApprovedStatus !== 2
-        ? true
-        : token0ApprovedStatus === 2 && token1ApprovedStatus !== 2
-        ? true
-        : token0ApprovedStatus !== 2 && token1ApprovedStatus === 2
-        ? true
-        : token0ApprovedStatus === 2 &&
-          token1ApprovedStatus === 2 &&
-          !isAddLiquidityButtonClicked
-        ? false
-        : token0ApprovedStatus === 2 &&
-          token1ApprovedStatus === 2 &&
-          isAddLiquidityButtonClicked
-        ? true
-        : true,
+        !isAddLiquidityButtonClicked
+      ? false
+      : token1Data &&
+        token1Data.tokenAddress.toString().toLowerCase() ===
+          props.network.wethAddress.toString().toLowerCase() &&
+        isAlreadyToken0Approved &&
+        isAddLiquidityButtonClicked
+      ? true
+      : // if already not approved
+      token1Data &&
+        token1Data.tokenAddress.toString().toLowerCase() ===
+          props.network.wethAddress.toString().toLowerCase() &&
+        token0ApprovedStatus !== 2
+      ? true
+      : token1Data &&
+        token1Data.tokenAddress.toString().toLowerCase() ===
+          props.network.wethAddress.toString().toLowerCase() &&
+        token0ApprovedStatus === 2 &&
+        !isAddLiquidityButtonClicked
+      ? false
+      : token1Data &&
+        token1Data.tokenAddress.toString().toLowerCase() ===
+          props.network.wethAddress.toString().toLowerCase() &&
+        token0ApprovedStatus === 2 &&
+        isAddLiquidityButtonClicked
+      ? true
+      : // token + token
+
+      isAlreadyToken0Approved &&
+        isAlreadyToken1Approved &&
+        !isAddLiquidityButtonClicked
+      ? false
+      : isAlreadyToken0Approved && token1ApprovedStatus !== 2
+      ? true
+      : token0ApprovedStatus !== 2 && isAlreadyToken1Approved
+      ? true
+      : token0ApprovedStatus !== 2 && token1ApprovedStatus !== 2
+      ? true
+      : token0ApprovedStatus === 2 && token1ApprovedStatus !== 2
+      ? true
+      : token0ApprovedStatus !== 2 && token1ApprovedStatus === 2
+      ? true
+      : token0ApprovedStatus === 2 &&
+        token1ApprovedStatus === 2 &&
+        !isAddLiquidityButtonClicked
+      ? false
+      : token0ApprovedStatus === 2 &&
+        token1ApprovedStatus === 2 &&
+        isAddLiquidityButtonClicked
+      ? true
+      : true,
     transactionHashData: transactionHashData,
     network: props.network,
     isAddLiquidityTransaction: true,
@@ -741,11 +751,13 @@ const JoinPoolPage = (props) => {
                 <AddLiquidityButton
                   add={confirmTransactionModalToggle}
                   isDisable={
-                    // eth + token
-                    token0Data.tokenAddress.toString().toLowerCase() ===
-                      props.network.wethAddress.toString().toLowerCase() &&
-                    isAlreadyToken1Approved &&
-                    !isAddLiquidityButtonClicked
+                    isFetching
+                      ? true
+                      : // eth + token
+                      token0Data.tokenAddress.toString().toLowerCase() ===
+                          props.network.wethAddress.toString().toLowerCase() &&
+                        isAlreadyToken1Approved &&
+                        !isAddLiquidityButtonClicked
                       ? false
                       : token0Data.tokenAddress.toString().toLowerCase() ===
                           props.network.wethAddress.toString().toLowerCase() &&

@@ -31,49 +31,75 @@ function SwapBoxTo({ SwapBoxToParams, network }) {
   const { poolAssets } = useSelector((state) => state.poolAssets);
 
   const setPoolPriceForAddLiqORJoinLiq = async (amount) => {
-    const reserves = await fetchReserves(
-      SwapBoxToParams.token0Data.tokenAddress,
-      SwapBoxToParams.token1Data.tokenAddress,
-      network.factory
-    );
-
-    if (reserves[0] === 0 && reserves[1] === 0) {
-      let p = [];
-      p.push(1);
-      p.push(1);
-      p.push(100);
-      await SwapBoxToParams.sendPoolPrice(p);
+    if (
+      (SwapBoxToParams.token0Data.isEth &&
+        (await SwapBoxToParams.token1Data.tokenAddress
+          .toString()
+          .toLowerCase()
+          .includes(await network.wethAddress.toString().toLowerCase()))) ||
+      ((await SwapBoxToParams.token0Data.tokenAddress
+        .toString()
+        .toLowerCase()
+        .includes(await network.wethAddress.toString().toLowerCase())) &&
+        SwapBoxToParams.token1Data.isEth)
+    ) {
     } else {
-      if (amount > 0) {
-        const quote = await quoteAddLiquidity(
-          SwapBoxToParams.token0Data.tokenAddress,
-          SwapBoxToParams.token1Data.tokenAddress,
-          amount,
-          true,
-          network.factory
-        );
-        if (quote.length > 0) {
-          await SwapBoxToParams.sendInputAmount0(Number(quote[0]));
-          let p = [];
-          p.push(reserves[1] / reserves[0]);
-          p.push(reserves[0] / reserves[1]);
-          const pair = await getPairAddress(
-            SwapBoxToParams.token0Data.tokenAddress,
-            SwapBoxToParams.token1Data.tokenAddress,
+      const reserves = await fetchReserves(
+        SwapBoxToParams.token0Data.isEth
+          ? await network.wethAddress
+          : SwapBoxToParams.token0Data.tokenAddress,
+        SwapBoxToParams.token1Data.isEth
+          ? await network.wethAddress
+          : SwapBoxToParams.token1Data.tokenAddress,
+        network.factory
+      );
+
+      if (reserves[0] === 0 && reserves[1] === 0) {
+        let p = [];
+        p.push(0);
+        p.push(0);
+        p.push(100);
+        await SwapBoxToParams.sendPoolPrice(p);
+      } else {
+        if (amount > 0) {
+          const quote = await quoteAddLiquidity(
+            SwapBoxToParams.token0Data.isEth
+              ? await network.wethAddress
+              : SwapBoxToParams.token0Data.tokenAddress,
+            SwapBoxToParams.token1Data.isEth
+              ? await network.wethAddress
+              : SwapBoxToParams.token1Data.tokenAddress,
+            amount,
+            true,
             network.factory
           );
-          if (pair) {
-            const pairContract = await getpairContract(pair);
-            const _totalSupply =
-              Number(await pairContract.methods.totalSupply().call()) *
-              10 ** -Number(await pairContract.methods.decimals().call());
-            let liqPercent =
-              (Number(quote[2]) / (Number(_totalSupply) + Number(quote[2]))) *
-              100;
-            p.push(Number(liqPercent));
+          if (quote.length > 0) {
+            await SwapBoxToParams.sendInputAmount0(Number(quote[0]));
+            let p = [];
+            p.push(reserves[1] / reserves[0]);
+            p.push(reserves[0] / reserves[1]);
+            const pair = await getPairAddress(
+              SwapBoxToParams.token0Data.isEth
+                ? await network.wethAddress
+                : SwapBoxToParams.token0Data.tokenAddress,
+              SwapBoxToParams.token1Data.isEth
+                ? await network.wethAddress
+                : SwapBoxToParams.token1Data.tokenAddress,
+              network.factory
+            );
+            if (pair) {
+              const pairContract = await getpairContract(pair);
+              const _totalSupply =
+                Number(await pairContract.methods.totalSupply().call()) *
+                10 ** -Number(await pairContract.methods.decimals().call());
+              let liqPercent =
+                (Number(quote[2]) / (Number(_totalSupply) + Number(quote[2]))) *
+                100;
+              p.push(Number(liqPercent));
+            }
+            // console.log(" to  " + p[2]);
+            await SwapBoxToParams.sendPoolPrice(p);
           }
-          // console.log(" to  " + p[2]);
-          await SwapBoxToParams.sendPoolPrice(p);
         }
       }
     }
@@ -105,12 +131,16 @@ function SwapBoxTo({ SwapBoxToParams, network }) {
       await SwapBoxToParams.sendInputAmount1(event.target.value);
 
       if (SwapBoxToParams.isAddLiquidityOn) {
+        await SwapBoxToParams.sendFetchingStatus(true);
         await setPoolPriceForAddLiqORJoinLiq(event.target.value);
+        await SwapBoxToParams.sendFetchingStatus(false);
       } else if (SwapBoxToParams.isJoinPoolOn) {
         await setPoolPriceForAddLiqORJoinLiq(event.target.value);
       } else if (SwapBoxToParams.isRemoveMyLiquidityOn) {
         if (isAuthenticated) {
-          if (event.target.value > 0) {
+          if (event.target.value > SwapBoxToParams.token1Data.balance) {
+            alert.error("insufficient liquidity");
+          } else if (event.target.value > 0) {
             const data = await getAmoutOutRemoveLiquidity(
               SwapBoxToParams.token0Data.tokenAddress,
               SwapBoxToParams.token1Data.tokenAddress,
@@ -127,106 +157,148 @@ function SwapBoxTo({ SwapBoxToParams, network }) {
           alert.error("You are not authorised");
         }
       } else {
-        if (
-          await checkForPairExists(
-            SwapBoxToParams.token0Data.tokenAddress,
-            SwapBoxToParams.token1Data.tokenAddress,
-            network.factory
-          )
-        ) {
-          if (event.target.value > 0) {
-            const reserves = await fetchReserves(
-              SwapBoxToParams.token0Data.tokenAddress,
-              SwapBoxToParams.token1Data.tokenAddress,
-              network.factory
-            );
-            if (Number(event.target.value) > Number(reserves[1])) {
-              alert.error(
-                `greater than reserve !\n amount should be less than ${reserves[1]}`
-              );
-            } else {
-              const amount = await getAmountIn(
-                [
-                  SwapBoxToParams.token0Data.tokenAddress,
-                  SwapBoxToParams.token1Data.tokenAddress,
-                ],
-                event.target.value,
-                network.router
-              );
+        // if (
+        //   await checkForPairExists(
+        //     SwapBoxToParams.token0Data.tokenAddress,
+        //     SwapBoxToParams.token1Data.tokenAddress,
+        //     network.factory
+        //   )
+        // ) {
+        //   if (event.target.value > 0) {
+        //     const reserves = await fetchReserves(
+        //       SwapBoxToParams.token0Data.tokenAddress,
+        //       SwapBoxToParams.token1Data.tokenAddress,
+        //       network.factory
+        //     );
+        //     if (Number(event.target.value) > Number(reserves[1])) {
+        //       alert.error(
+        //         `greater than reserve !\n amount should be less than ${reserves[1]}`
+        //       );
+        //     } else {
+        //       const amount = await getAmountIn(
+        //         [
+        //           SwapBoxToParams.token0Data.tokenAddress,
+        //           SwapBoxToParams.token1Data.tokenAddress,
+        //         ],
+        //         event.target.value,
+        //         network.router
+        //       );
 
-              await SwapBoxToParams.sendInputAmount0(amount);
-              await SwapBoxToParams.sendSmartRoute([
-                SwapBoxToParams.token0Data.tokenAddress,
-                SwapBoxToParams.token1Data.tokenAddress,
-              ]);
-            }
-          }
-        } else if (poolAssets && Object.values(poolAssets).length > 0) {
-          if (event.target.value > 0) {
-            let routes = await SmartRoutes(
-              Object.values(poolAssets),
-              SwapBoxToParams.token0Data.tokenAddress,
-              SwapBoxToParams.token1Data.tokenAddress
-            );
-            if (routes.length > 0) {
-              let bestPrice = 0;
-              let bestRoute = [];
-              let i = routes.length;
-              for (const item of routes) {
-                const reserves = await fetchReserves(
-                  item[item.length - 2],
-                  item[item.length - 1],
-                  network.factory
+        //       await SwapBoxToParams.sendInputAmount0(amount);
+        //       await SwapBoxToParams.sendSmartRoute([
+        //         SwapBoxToParams.token0Data.tokenAddress,
+        //         SwapBoxToParams.token1Data.tokenAddress,
+        //       ]);
+        //     }
+        //   }
+        // } else
+        if (event.target.value > 0) {
+          //console.log("nc");
+          if (
+            SwapBoxToParams.token0Data.isEth &&
+            SwapBoxToParams.token1Data.tokenAddress
+              .toString()
+              .toLowerCase()
+              .includes(await network.wethAddress.toString().toLowerCase())
+          ) {
+            //console.log("hsk");
+            await SwapBoxToParams.sendInputAmount0(event.target.value);
+            //let weth = await getWethContract(await network.wethAddress)
+          } else if (
+            SwapBoxToParams.token1Data.isEth &&
+            SwapBoxToParams.token0Data.tokenAddress
+              .toString()
+              .toLowerCase()
+              .includes(await network.wethAddress.toString().toLowerCase())
+          ) {
+            await SwapBoxToParams.sendInputAmount0(event.target.value);
+          } else {
+            if (poolAssets && Object.values(poolAssets).length > 0) {
+              if (event.target.value > 0) {
+                await SwapBoxToParams.sendFetchingStatus(true);
+                let routes = await SmartRoutes(
+                  Object.values(poolAssets),
+                  SwapBoxToParams.token0Data.isEth
+                    ? network.wethAddress
+                    : SwapBoxToParams.token0Data.tokenAddress,
+                  SwapBoxToParams.token1Data.isEth
+                    ? network.wethAddress
+                    : SwapBoxToParams.token1Data.tokenAddress
                 );
-                if (i === 1) {
-                  if (
-                    Number(event.target.value) > Number(reserves[1]) &&
-                    bestRoute.length === 0
-                  ) {
-                    alert.error(
-                      `greater than reserve !\n amount should be less than ${reserves[1]}`
+                if (routes.length > 0) {
+                  let bestPrice = 0;
+                  let bestRoute = [];
+                  let i = routes.length;
+                  for (const item of routes) {
+                    const reserves = await fetchReserves(
+                      item[item.length - 2],
+                      item[item.length - 1],
+                      network.factory
                     );
-                  } else if (
-                    Number(event.target.value) > Number(reserves[1]) &&
-                    bestRoute.length !== 0
-                  ) {
-                    continue;
-                  } else if (
-                    Number(event.target.value) <= Number(reserves[1])
-                  ) {
-                    let price = await getAmountIn(
-                      item,
-                      event.target.value,
-                      network.router
-                    );
-                    if (price > bestPrice) {
-                      bestPrice = price;
-                      bestRoute = item;
+                    if (i === 1) {
+                      if (
+                        Number(event.target.value) > Number(reserves[1]) &&
+                        bestRoute.length === 0
+                      ) {
+                        await SwapBoxToParams.sendInputAmount1("");
+                        alert.error(
+                          `greater than reserve !\n amount should be less than ${reserves[1]}`
+                        );
+                      } else if (
+                        Number(event.target.value) > Number(reserves[1]) &&
+                        bestRoute.length !== 0
+                      ) {
+                        continue;
+                      } else if (
+                        Number(event.target.value) <= Number(reserves[1])
+                      ) {
+                        let price = await getAmountIn(
+                          item,
+                          event.target.value,
+                          network.router
+                        );
+                        if (price > bestPrice) {
+                          bestPrice = price;
+                          bestRoute = item;
+                        }
+                      }
+                    } else {
+                      i--;
+                      if (Number(event.target.value) > Number(reserves[1])) {
+                        continue;
+                      } else {
+                        let price = await getAmountIn(
+                          item,
+                          event.target.value,
+                          network.router
+                        );
+                        if (price > bestPrice) {
+                          bestPrice = price;
+                          bestRoute = item;
+                        }
+                      }
                     }
+                  }
+                  // eth -weth
+                  if (SwapBoxToParams.token0Data.isEth) {
+                    bestRoute[0] = SwapBoxToParams.token0Data.tokenAddress;
+                  } else if (SwapBoxToParams.token1Data.isEth) {
+                    bestRoute[bestRoute.length - 1] =
+                      SwapBoxToParams.token1Data.tokenAddress;
+                  }
+                  //
+                  if (bestPrice !== 0) {
+                    await SwapBoxToParams.sendInputAmount0(bestPrice);
+                    await SwapBoxToParams.sendSmartRoute(bestRoute);
                   }
                 } else {
-                  i--;
-                  if (Number(event.target.value) > Number(reserves[1])) {
-                    continue;
-                  } else {
-                    let price = await getAmountIn(
-                      item,
-                      event.target.value,
-                      network.router
-                    );
-                    if (price > bestPrice) {
-                      bestPrice = price;
-                      bestRoute = item;
-                    }
-                  }
+                  alert.error("No route found");
                 }
-              }
-              if (bestPrice !== 0) {
-                await SwapBoxToParams.sendInputAmount0(bestPrice);
-                await SwapBoxToParams.sendSmartRoute(bestRoute);
+                await SwapBoxToParams.sendFetchingStatus(false);
               }
             } else {
-              alert.error("No route found");
+              await SwapBoxToParams.sendInputAmount1("");
+              alert.info("Please wait while loading data");
             }
           }
         }
@@ -280,105 +352,149 @@ function SwapBoxTo({ SwapBoxToParams, network }) {
           }
         }
       } else {
-        if (
-          await checkForPairExists(
-            SwapBoxToParams.token0Data.tokenAddress,
-            SwapBoxToParams.token1Data.tokenAddress,
-            network.factory
-          )
-        ) {
-          if (SwapBoxToParams.token1Data.balance > 0) {
-            const reserves = await fetchReserves(
-              SwapBoxToParams.token0Data.tokenAddress,
-              SwapBoxToParams.token1Data.tokenAddress,
-              network.factory
-            );
-            if (SwapBoxToParams.token1Data.balance > reserves[1]) {
-              alert.error(
-                `greater than reserve !\n amount should be less than ${reserves[1]}`
-              );
-            } else {
-              const amount = await getAmountIn(
-                [
-                  SwapBoxToParams.token0Data.tokenAddress,
-                  SwapBoxToParams.token1Data.tokenAddress,
-                ],
-                SwapBoxToParams.token1Data.balance,
-                network.router
-              );
+        // if (
+        //   await checkForPairExists(
+        //     SwapBoxToParams.token0Data.tokenAddress,
+        //     SwapBoxToParams.token1Data.tokenAddress,
+        //     network.factory
+        //   )
+        // ) {
+        //   if (SwapBoxToParams.token1Data.balance > 0) {
+        //     const reserves = await fetchReserves(
+        //       SwapBoxToParams.token0Data.tokenAddress,
+        //       SwapBoxToParams.token1Data.tokenAddress,
+        //       network.factory
+        //     );
+        //     if (SwapBoxToParams.token1Data.balance > reserves[1]) {
+        //       alert.error(
+        //         `greater than reserve !\n amount should be less than ${reserves[1]}`
+        //       );
+        //     } else {
+        //       const amount = await getAmountIn(
+        //         [
+        //           SwapBoxToParams.token0Data.tokenAddress,
+        //           SwapBoxToParams.token1Data.tokenAddress,
+        //         ],
+        //         SwapBoxToParams.token1Data.balance,
+        //         network.router
+        //       );
 
-              await SwapBoxToParams.sendInputAmount0(amount);
-              await SwapBoxToParams.sendSmartRoute([
-                SwapBoxToParams.token0Data.tokenAddress,
-                SwapBoxToParams.token1Data.tokenAddress,
-              ]);
-            }
-          }
-        } else if (poolAssets && Object.values(poolAssets).length > 0) {
-          if (SwapBoxToParams.token1Data.balance > 0) {
-            let routes = await SmartRoutes(
-              Object.values(poolAssets),
-              SwapBoxToParams.token0Data.tokenAddress,
-              SwapBoxToParams.token1Data.tokenAddress
-            );
-            if (routes.length > 0) {
-              let bestPrice = 0;
-              let bestRoute = [];
-              let i = routes.length;
-              for (const item of routes) {
-                const reserves = await fetchReserves(
-                  item[item.length - 2],
-                  item[item.length - 1],
-                  network.factory
-                );
-                if (i === 1) {
-                  if (
-                    SwapBoxToParams.token1Data.balance > reserves[1] &&
-                    bestRoute.length === 0
-                  ) {
-                    alert.error(
-                      `greater than reserve !\n amount should be less than ${reserves[1]}`
-                    );
-                  } else if (
-                    SwapBoxToParams.token1Data.balance > reserves[1] &&
-                    bestRoute.length !== 0
-                  ) {
-                    continue;
-                  } else if (SwapBoxToParams.token1Data.balance < reserves[1]) {
-                    let price = await getAmountIn(
-                      item,
-                      SwapBoxToParams.token1Data.balance,
-                      network.router
-                    );
-                    if (price > bestPrice) {
-                      bestPrice = price;
-                      bestRoute = item;
+        //       await SwapBoxToParams.sendInputAmount0(amount);
+        //       await SwapBoxToParams.sendSmartRoute([
+        //         SwapBoxToParams.token0Data.tokenAddress,
+        //         SwapBoxToParams.token1Data.tokenAddress,
+        //       ]);
+        //     }
+        //   }
+        // } else
+        if (
+          SwapBoxToParams.token0Data.isEth &&
+          SwapBoxToParams.token1Data.tokenAddress
+            .toString()
+            .toLowerCase()
+            .includes(await network.wethAddress.toString().toLowerCase())
+        ) {
+          //console.log("hsk");
+          await SwapBoxToParams.sendInputAmount0(
+            SwapBoxToParams.token1Data.balance
+          );
+          //let weth = await getWethContract(await network.wethAddress)
+        } else if (
+          SwapBoxToParams.token1Data.isEth &&
+          SwapBoxToParams.token0Data.tokenAddress
+            .toString()
+            .toLowerCase()
+            .includes(await network.wethAddress.toString().toLowerCase())
+        ) {
+          await SwapBoxToParams.sendInputAmount0(
+            SwapBoxToParams.token1Data.balance
+          );
+        } else {
+          if (poolAssets && Object.values(poolAssets).length > 0) {
+            if (SwapBoxToParams.token1Data.balance > 0) {
+              await SwapBoxToParams.sendFetchingStatus(true);
+              let routes = await SmartRoutes(
+                Object.values(poolAssets),
+                SwapBoxToParams.token0Data.isEth
+                  ? network.wethAddress
+                  : SwapBoxToParams.token0Data.tokenAddress,
+                SwapBoxToParams.token1Data.isEth
+                  ? network.wethAddress
+                  : SwapBoxToParams.token1Data.tokenAddress
+              );
+              if (routes.length > 0) {
+                let bestPrice = 0;
+                let bestRoute = [];
+                let i = routes.length;
+                for (const item of routes) {
+                  const reserves = await fetchReserves(
+                    item[item.length - 2],
+                    item[item.length - 1],
+                    network.factory
+                  );
+                  if (i === 1) {
+                    if (
+                      SwapBoxToParams.token1Data.balance > reserves[1] &&
+                      bestRoute.length === 0
+                    ) {
+                      alert.error(
+                        `greater than reserve !\n amount should be less than ${reserves[1]}`
+                      );
+                    } else if (
+                      SwapBoxToParams.token1Data.balance > reserves[1] &&
+                      bestRoute.length !== 0
+                    ) {
+                      continue;
+                    } else if (
+                      SwapBoxToParams.token1Data.balance < reserves[1]
+                    ) {
+                      let price = await getAmountIn(
+                        item,
+                        SwapBoxToParams.token1Data.balance,
+                        network.router
+                      );
+                      if (price > bestPrice) {
+                        bestPrice = price;
+                        bestRoute = item;
+                      }
                     }
-                  }
-                } else {
-                  i--;
-                  if (SwapBoxToParams.token1Data.balance > reserves[1]) {
-                    continue;
                   } else {
-                    let price = await getAmountIn(
-                      item,
-                      SwapBoxToParams.token1Data.balance,
-                      network.router
-                    );
-                    if (price > bestPrice) {
-                      bestPrice = price;
-                      bestRoute = item;
+                    i--;
+                    if (SwapBoxToParams.token1Data.balance > reserves[1]) {
+                      continue;
+                    } else {
+                      let price = await getAmountIn(
+                        item,
+                        SwapBoxToParams.token1Data.balance,
+                        network.router
+                      );
+                      if (price > bestPrice) {
+                        bestPrice = price;
+                        bestRoute = item;
+                      }
                     }
                   }
                 }
+                // eth -weth
+                if (SwapBoxToParams.token0Data.isEth) {
+                  bestRoute[0] = SwapBoxToParams.token0Data.tokenAddress;
+                } else if (SwapBoxToParams.token1Data.isEth) {
+                  bestRoute[bestRoute.length - 1] =
+                    SwapBoxToParams.token1Data.tokenAddress;
+                }
+                //
+                if (bestPrice !== 0) {
+                  await SwapBoxToParams.sendInputAmount0(bestPrice);
+                  await SwapBoxToParams.sendSmartRoute(bestRoute);
+                }
+              } else {
+                alert.error("No route found");
               }
-              if (bestPrice !== 0) {
-                await SwapBoxToParams.sendInputAmount0(bestPrice);
-                await SwapBoxToParams.sendSmartRoute(bestRoute);
-              }
-            } else {
-              alert.error("No route found");
+              await SwapBoxToParams.sendFetchingStatus(false);
             }
+          } else {
+            await SwapBoxToParams.sendInputAmount1("");
+            alert.info("Please wait while loading data");
           }
         }
       }

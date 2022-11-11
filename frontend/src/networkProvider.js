@@ -19,7 +19,7 @@ import {
   PoolAssetsAction,
 } from "./actions/contractAction.js";
 import Cookies from "js-cookie";
-import { login } from "./actions/userAction";
+import { login, logout } from "./actions/userAction";
 import { useDispatch, useSelector } from "react-redux";
 
 import * as chains from "./constants/chains";
@@ -87,12 +87,12 @@ const NetworkProvider = (props) => {
           setmaster(network);
           setConnected(false);
 
-          alert("Connect to Goerli or smart chain testnet network");
+          alert.error("Connect to Goerli or smart chain testnet network");
         }
       });
     } catch (e) {
       setConnected(false);
-      alert("Something went wrong\nPlease try after sometime");
+      alert.error("Something went wrong\nPlease try after sometime");
     }
   }
   async function log() {
@@ -157,10 +157,7 @@ const NetworkProvider = (props) => {
   }, []);
 
   useEffect(() => {
-    // if (error) {
-    //   alert.error(error);
-    //   dispatch(clearErrors());
-    // }
+    // console.log("bnzcjs");
     if (isConnected) {
       if (isAuthenticated) {
         store.dispatch(
@@ -183,7 +180,14 @@ const NetworkProvider = (props) => {
       }
       if (!isAuthenticated) {
         if (Cookies.get("INDISWAPUSER")) {
-          dispatch(login());
+          if (window.ethereum) {
+            async function l() {
+              if (await window.ethereum._metamask.isUnlocked()) {
+                dispatch(login());
+              }
+            }
+            l();
+          }
         }
         dispatch(
           PoolAssetsAction(
@@ -201,11 +205,16 @@ const NetworkProvider = (props) => {
   useEffect(() => {
     async function listen() {
       if (props && props.chainId && props.chainId !== network.chainId) {
-        console.log("bnzcjs");
-        await setupConnection();
-        if (isAuthenticated) {
-          dispatch(login());
+        //console.log("bnzcjs");
+
+        if (chains.networks.includes(props.chainId)) {
+          if (isAuthenticated) {
+            dispatch(login());
+          }
+        } else if (!chains.networks.includes(props.chainId)) {
+          dispatch(logout());
         }
+        await setupConnection();
       }
     }
     listen();

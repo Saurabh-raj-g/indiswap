@@ -390,6 +390,7 @@ const RemoveMyLiquidityPage = (props) => {
     amount0: input0,
     sendInputAmount1: getInput1,
     isRemoveMyLiquidityOn: true,
+    // myAssets: myAssets ? myAssets : null,
     // sendInputAmount0Min: getAmountMinInput0,
     // sendInputAmount1Min: getAmountMinInput1,
     // amount0Min: amountMinInput0,
@@ -404,6 +405,7 @@ const RemoveMyLiquidityPage = (props) => {
     amount1: input1,
     sendInputAmount1: getInput1,
     isRemoveMyLiquidityOn: true,
+
     // sendInputAmount0Min: getAmountMinInput0,
     // sendInputAmount1Min: getAmountMinInput1,
     // amount1Min: amountMinInput1,

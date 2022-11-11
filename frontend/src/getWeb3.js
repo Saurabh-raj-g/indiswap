@@ -10,6 +10,7 @@ const getWeb3 = async () => {
     // console.log(" nb  " + ethers.utils.hexValue(56));
     try {
       // Request account access if needed
+
       await window.ethereum.request({ method: "eth_requestAccounts" });
 
       // Accounts now exposed

@@ -51,6 +51,7 @@ import { clearErrors, login } from "../../actions/userAction";
 import { useAlert } from "react-alert";
 import DynamicButton from "../layout/Utils/Button/DynamicButton";
 
+import FontSizeLoader from ".././layout/Loader/FontSizeLoader.js";
 const SwapPage = (props) => {
   // const web3 = new Web3(window.ethereum);
   const [modal, setModal] = useState(false);
@@ -60,6 +61,8 @@ const SwapPage = (props) => {
   const [isToken0Approved, setIsToken0Approved] = useState(0);
   const [isAlreadyTokenApproved, setAlreadyTokenApproved] = useState(false);
   const [isSwapButtonClicked, setSwapButtonClicked] = useState(false);
+
+  const [isFetching, setIsFetching] = useState(false);
 
   const [reservesDetails, setReservesDetails] = useState([]);
 
@@ -86,6 +89,10 @@ const SwapPage = (props) => {
   //   const { weth } = useSelector((state) => state.weth);
   const { slippage } = useSelector((state) => state.slippage);
   const { deadline } = useSelector((state) => state.deadline);
+
+  const setFetching = async (t) => {
+    setIsFetching(t);
+  };
 
   const togglemodal = () => {
     setModal(!modal);
@@ -157,6 +164,7 @@ const SwapPage = (props) => {
   const tokenApprove = async () => {
     if (isAuthenticated && token0Data && token1Data && input0 && input1) {
       setIsToken0Approved(1);
+
       let p = await approveToken(
         token0Data.tokenAddress,
         props.network.router._address,
@@ -205,21 +213,22 @@ const SwapPage = (props) => {
         }
       }
       if (ischange) {
-        if (
-          await checkForPairExists(
-            token0Data.tokenAddress,
-            token1Data.tokenAddress,
-            props.network.factory
-          )
-        ) {
-          const amount = await getAmountOut(
-            [token0Data.tokenAddress, token1Data.tokenAddress],
-            input0,
-            props.network.router
-          );
-          //("sgs");
-          setInput1(amount);
-        } else if (poolAssets && Object.values(poolAssets).length > 0) {
+        // if (
+        //   await checkForPairExists(
+        //     token0Data.tokenAddress,
+        //     token1Data.tokenAddress,
+        //     props.network.factory
+        //   )
+        // ) {
+        //   const amount = await getAmountOut(
+        //     [token0Data.tokenAddress, token1Data.tokenAddress],
+        //     input0,
+        //     props.network.router
+        //   );
+        //   //("sgs");
+        //   setInput1(amount);
+        // } else
+        if (poolAssets && Object.values(poolAssets).length > 0) {
           if (input0 > 0) {
             let routes = await SmartRoutes(
               Object.values(poolAssets),
@@ -254,8 +263,41 @@ const SwapPage = (props) => {
     setSwapButtonClicked(true);
     dispatch(transactionStatusAction(3));
     // setAlreadyTokenApproved(false);
+
+    //console.log(token1Data.isEth);
+    //let smtRoute = [...smartRoute];
+    // if (
+    //   token0Data.isEth &&
+    //   !(await token1Data.tokenAddress
+    //     .toString()
+    //     .toLowerCase()
+    //     .includes(await props.network.wethAddress.toString().toLowerCase()))
+    // ) {
+    //   smtRoute[0] = await props.network.wethAddress;
+    // } else if (
+    //   !(await token0Data.tokenAddress
+    //     .toString()
+    //     .toLowerCase()
+    //     .includes(await props.network.wethAddress.toString().toLowerCase())) &&
+    //   token1Data.isEth
+    // ) {
+    //   smtRoute[smtRoute.length - 1] = await props.network.wethAddress;
+    // }
     const p = await swap(
-      smartRoute,
+      token0Data.isEth &&
+        (await token1Data.tokenAddress
+          .toString()
+          .toLowerCase()
+          .includes(await props.network.wethAddress.toString().toLowerCase()))
+        ? [token0Data.tokenAddress, token1Data.tokenAddress]
+        : (await token0Data.tokenAddress
+            .toString()
+            .toLowerCase()
+            .includes(
+              await props.network.wethAddress.toString().toLowerCase()
+            )) && token1Data.isEth
+        ? [token0Data.tokenAddress, token1Data.tokenAddress]
+        : smartRoute,
       input0,
       input1,
       slippage.slippage,
@@ -375,112 +417,270 @@ const SwapPage = (props) => {
   };
   useEffect(() => {
     getTokenDataLoad();
-
-    //console.log(props.network);
   }, [user, error, isAuthenticated]);
 
   // update amoutout/amountin on tokens change
 
   const get2 = async (t0, t1, am, isInput1) => {
     //console.log(smartRoute);
+    // if (
+    //   await checkForPairExists(
+    //     t0.tokenAddress,
+    //     t1.tokenAddress,
+    //     props.network.factory
+    //   )
+    // ) {
+    //   const reserves = await fetchReserves(
+    //     t0.tokenAddress,
+    //     t1.tokenAddress,
+    //     props.network.factory
+    //   );
+    //   // update reservesDetails
+    //   let x = [];
+    //   await x.push(reserves);
+    //   setReservesDetails(x);
+    //   //console.log(t0.tokenAddress);
+    //   if (isInput1) {
+    //     if (Number(am) > Number(reserves[1])) {
+    //       alert.error(
+    //         `greater than reserve !\n amount should be less than ${reserves[1]}`
+    //       );
+    //     } else {
+    //       const amount = await getAmountIn(
+    //         [t0.tokenAddress, t1.tokenAddress],
+    //         am,
+    //         props.network.router
+    //       );
+
+    //       setInput0(amount);
+    //       setSmartRoute([t0.tokenAddress, t1.tokenAddress]);
+    //       setSmartRouteData([t0, t1]);
+    //     }
+    //   } else {
+    //     const amount = await getAmountOut(
+    //       [t0.tokenAddress, t1.tokenAddress],
+    //       am,
+    //       props.network.router
+    //     );
+    //     setInput1(amount);
+    //     setSmartRoute([t0.tokenAddress, t1.tokenAddress]);
+    //     setSmartRouteData([t0, t1]);
+    //   }
+    // } else
+
+    // eth-weth
     if (
-      await checkForPairExists(
-        t0.tokenAddress,
-        t1.tokenAddress,
-        props.network.factory
-      )
+      token0Data.isEth &&
+      token1Data.tokenAddress
+        .toString()
+        .toLowerCase()
+        .includes(await props.network.wethAddress.toString().toLowerCase())
     ) {
-      const reserves = await fetchReserves(
-        t0.tokenAddress,
-        t1.tokenAddress,
-        props.network.factory
-      );
-      // update reservesDetails
-      let x = [];
-      await x.push(reserves);
-      setReservesDetails(x);
-      //console.log(t0.tokenAddress);
       if (isInput1) {
-        if (Number(am) > Number(reserves[1])) {
-          alert.error(
-            `greater than reserve !\n amount should be less than ${reserves[1]}`
-          );
-        } else {
-          const amount = await getAmountIn(
-            [t0.tokenAddress, t1.tokenAddress],
-            am,
-            props.network.router
-          );
-
-          setInput0(amount);
-          setSmartRoute([t0.tokenAddress, t1.tokenAddress]);
-          setSmartRouteData([t0, t1]);
-        }
+        setInput0(am);
       } else {
-        const amount = await getAmountOut(
-          [t0.tokenAddress, t1.tokenAddress],
-          am,
-          props.network.router
-        );
-        setInput1(amount);
-        setSmartRoute([t0.tokenAddress, t1.tokenAddress]);
-        setSmartRouteData([t0, t1]);
+        setInput1(am);
       }
-    } else if (poolAssets && Object.values(poolAssets).length > 0) {
-      //  console.log("v");
-      let routes = await SmartRoutes(
-        Object.values(poolAssets),
-        t0.tokenAddress,
-        t1.tokenAddress
-      );
-
-      //console.log([t0.symbol, t1.symbol]);
-      // console.log([routes, routes.length]);
+    } else if (
+      SwapBoxFromParams.token0Data.tokenAddress
+        .toString()
+        .toLowerCase()
+        .includes(await props.network.wethAddress.toString().toLowerCase()) &&
+      SwapBoxFromParams.token1Data.isEth
+    ) {
       if (isInput1) {
-        if (routes.length > 0) {
-          let bestPrice = 0;
-          let bestRoute = [];
-          let i = routes.length;
-          for (const item of routes) {
-            const reserves = await fetchReserves(
-              item[item.length - 2],
-              item[item.length - 1],
-              props.network.factory
-            );
-            if (i === 1) {
-              if (Number(am) > Number(reserves[1]) && bestRoute.length === 0) {
-                alert.error(
-                  `greater than reserve !\n amount should be less than ${reserves[1]}`
-                );
-              } else if (
-                Number(am) > Number(reserves[1]) &&
-                bestRoute.length !== 0
-              ) {
-                continue;
-              } else if (Number(am) <= Number(reserves[1])) {
-                let price = await getAmountIn(item, am, props.network.router);
-                if (price > bestPrice) {
-                  bestPrice = price;
-                  bestRoute = item;
+        setInput0(am);
+      } else {
+        setInput1(am);
+      }
+    } else {
+      if (poolAssets && Object.values(poolAssets).length > 0) {
+        //  console.log("v");
+        await setFetching(true);
+        let routes = await SmartRoutes(
+          Object.values(poolAssets),
+          t0.isEth ? props.network.wethAddress : t0.tokenAddress,
+          t1.isEth ? props.network.wethAddress : t1.tokenAddress
+        );
+
+        //console.log([t0.symbol, t1.symbol]);
+        // console.log([routes, routes.length]);
+        if (isInput1) {
+          if (routes.length > 0) {
+            let bestPrice = 0;
+            let bestRoute = [];
+            let i = routes.length;
+            for (const item of routes) {
+              const reserves = await fetchReserves(
+                item[item.length - 2],
+                item[item.length - 1],
+                props.network.factory
+              );
+              if (i === 1) {
+                if (
+                  Number(am) > Number(reserves[1]) &&
+                  bestRoute.length === 0
+                ) {
+                  setInput1("");
+                  alert.error(
+                    `greater than reserve !\n amount should be less than ${reserves[1]}`
+                  );
+                } else if (
+                  Number(am) > Number(reserves[1]) &&
+                  bestRoute.length !== 0
+                ) {
+                  continue;
+                } else if (Number(am) <= Number(reserves[1])) {
+                  let price = await getAmountIn(item, am, props.network.router);
+                  if (price > bestPrice) {
+                    bestPrice = price;
+                    bestRoute = item;
+                  }
                 }
-              }
-            } else {
-              i--;
-              if (Number(am) > Number(reserves[1])) {
-                continue;
               } else {
-                let price = await getAmountIn(item, am, props.network.router);
-                if (price > bestPrice) {
-                  bestPrice = price;
-                  bestRoute = item;
+                i--;
+                if (Number(am) > Number(reserves[1])) {
+                  continue;
+                } else {
+                  let price = await getAmountIn(item, am, props.network.router);
+                  if (price > bestPrice) {
+                    bestPrice = price;
+                    bestRoute = item;
+                  }
                 }
               }
             }
-          }
 
-          //.log(bestRoute);
-          if (bestPrice !== 0) {
-            setInput0(bestPrice);
+            //.log(bestRoute);
+            if (bestPrice !== 0) {
+              setInput0(bestPrice);
+              // eth -weth
+              if (t0.isEth) {
+                bestRoute[0] = t0.tokenAddress;
+              } else if (t1.isEth) {
+                bestRoute[bestRoute.length - 1] = t1.tokenAddress;
+              }
+              //
+              setSmartRoute(bestRoute);
+              let p = [];
+              // reservesDeatils updating
+              let xx = [];
+              for (let i = 0; i < bestRoute.length; i++) {
+                for (let j = 0; j < Object.values(poolAssets).length; j++) {
+                  if (
+                    (await Object.values(poolAssets)
+                      [j].token0Data.tokenAddress.toString()
+                      .toLowerCase()) ===
+                    ((await bestRoute[i].toString()) === "eth" ||
+                    (await bestRoute[i].toString()) === "bnb"
+                      ? props.network.wethAddress.toString().toLowerCase()
+                      : await bestRoute[i].toString().toLowerCase())
+                  ) {
+                    if ((await bestRoute[i].toString()) === "eth") {
+                      let tl = [...(await Object.values(poolAssets))];
+                      let tq = tl[j];
+                      let tk = tq.token0Data;
+                      //tk.tokenAddress = "eth";
+                      tk.name = "ether";
+                      tk.symbol = "ETH";
+                      p.push(tk);
+                      break;
+                    } else if ((await bestRoute[i].toString()) === "bnb") {
+                      let tl = [...(await Object.values(poolAssets))];
+                      let tq = tl[j];
+                      let tk = tq.token0Data;
+                      //tk.tokenAddress = "bnb";
+                      tk.name = "Binance chain native token";
+                      tk.symbol = "BNB";
+                      p.push(tk);
+                      break;
+                    } else {
+                      p.push(Object.values(poolAssets)[j].token0Data);
+                      break;
+                    }
+                  } else if (
+                    (await Object.values(poolAssets)
+                      [j].token1Data.tokenAddress.toString()
+                      .toLowerCase()) ===
+                    ((await bestRoute[i].toString()) === "eth" ||
+                    (await bestRoute[i].toString()) === "bnb"
+                      ? props.network.wethAddress.toString().toLowerCase()
+                      : await bestRoute[i].toString().toLowerCase())
+                  ) {
+                    if ((await bestRoute[i].toString()) === "eth") {
+                      let tl = [...(await Object.values(poolAssets))];
+                      let tq = tl[j];
+                      let tk = tq.token1Data;
+                      // tk.tokenAddress = "eth";
+                      tk.name = "ether";
+                      tk.symbol = "ETH";
+                      p.push(tk);
+                      break;
+                    } else if ((await bestRoute[i].toString()) === "bnb") {
+                      let tl = [...(await Object.values(poolAssets))];
+                      let tq = tl[j];
+                      let tk = tq.token1Data;
+                      // tk.tokenAddress = "bnb";
+                      tk.name = "Binance chain native token";
+                      tk.symbol = "BNB";
+                      p.push(tk);
+                      break;
+                    } else {
+                      p.push(Object.values(poolAssets)[j].token1Data);
+                      break;
+                    }
+                  }
+                }
+                // reservesDeatils updating
+                if (i < bestRoute.length - 1) {
+                  let x = await fetchReserves(
+                    (await bestRoute[i].toString()) === "eth" ||
+                      (await bestRoute[i].toString()) === "bnb"
+                      ? props.network.wethAddress
+                      : bestRoute[i],
+                    (await bestRoute[i + 1].toString()) === "eth" ||
+                      (await bestRoute[i + 1].toString()) === "bnb"
+                      ? props.network.wethAddress
+                      : bestRoute[i + 1],
+                    props.network.factory
+                  );
+                  xx.push(x);
+                }
+              }
+              setReservesDetails(xx);
+              setSmartRouteData(p);
+            }
+          } else {
+            alert.error("No route found");
+            setInput0("");
+            setInput1("");
+          }
+        } else {
+          // console.log("bestRoute[0]");
+          if (routes.length > 0) {
+            let bestPrice = 0;
+            let bestRoute = [];
+            for (const item of routes) {
+              let price = await getAmountOut(
+                item,
+                input0,
+                props.network.router
+              );
+              if (price > bestPrice) {
+                bestPrice = price;
+                bestRoute = item;
+              }
+            }
+            // console.log(bestRoute[0]);
+            setInput1(bestPrice);
+            await setFetching(false);
+            // eth -weth
+            if (t0.isEth) {
+              bestRoute[0] = t0.tokenAddress;
+            } else if (t1.isEth) {
+              bestRoute[bestRoute.length - 1] = t1.tokenAddress;
+            }
+            //
             setSmartRoute(bestRoute);
             let p = [];
             // reservesDeatils updating
@@ -491,25 +691,78 @@ const SwapPage = (props) => {
                   (await Object.values(poolAssets)
                     [j].token0Data.tokenAddress.toString()
                     .toLowerCase()) ===
-                  (await bestRoute[i].toString().toLowerCase())
+                  ((await bestRoute[i].toString()) === "eth" ||
+                  (await bestRoute[i].toString()) === "bnb"
+                    ? props.network.wethAddress.toString().toLowerCase()
+                    : await bestRoute[i].toString().toLowerCase())
                 ) {
-                  p.push(Object.values(poolAssets)[j].token0Data);
-                  break;
+                  if ((await bestRoute[i].toString()) === "eth") {
+                    let tl = [...(await Object.values(poolAssets))];
+                    let tq = tl[j];
+                    let tk = tq.token0Data;
+                    // tk.tokenAddress = "eth";
+                    tk.name = "ether";
+                    tk.symbol = "ETH";
+                    p.push(tk);
+                    break;
+                  } else if ((await bestRoute[i].toString()) === "bnb") {
+                    let tl = [...(await Object.values(poolAssets))];
+                    let tq = tl[j];
+                    let tk = tq.token0Data;
+                    //  tk.tokenAddress = "bnb";
+                    tk.name = "Binance chain native token";
+                    tk.symbol = "BNB";
+                    p.push(tk);
+
+                    break;
+                  } else {
+                    p.push(Object.values(poolAssets)[j].token0Data);
+                    break;
+                  }
                 } else if (
                   (await Object.values(poolAssets)
                     [j].token1Data.tokenAddress.toString()
                     .toLowerCase()) ===
-                  (await bestRoute[i].toString().toLowerCase())
+                  ((await bestRoute[i].toString()) === "eth" ||
+                  (await bestRoute[i].toString()) === "bnb"
+                    ? props.network.wethAddress.toString().toLowerCase()
+                    : await bestRoute[i].toString().toLowerCase())
                 ) {
-                  p.push(Object.values(poolAssets)[j].token1Data);
-                  break;
+                  if ((await bestRoute[i].toString()) === "eth") {
+                    let tl = [...(await Object.values(poolAssets))];
+                    let tq = tl[j];
+                    let tk = tq.token1Data;
+                    // tk.tokenAddress = "eth";
+                    tk.name = "ether";
+                    tk.symbol = "ETH";
+                    p.push(tk);
+                    break;
+                  } else if ((await bestRoute[i].toString()) === "bnb") {
+                    let tl = [...(await Object.values(poolAssets))];
+                    let tq = tl[j];
+                    let tk = tq.token1Data;
+                    //  tk.tokenAddress = "bnb";
+                    tk.name = "Binance chain native token";
+                    tk.symbol = "BNB";
+                    p.push(tk);
+                    break;
+                  } else {
+                    p.push(Object.values(poolAssets)[j].token1Data);
+                    break;
+                  }
                 }
               }
               // reservesDeatils updating
               if (i < bestRoute.length - 1) {
                 let x = await fetchReserves(
-                  bestRoute[i],
-                  bestRoute[i + 1],
+                  (await bestRoute[i].toString()) === "eth" ||
+                    (await bestRoute[i].toString()) === "bnb"
+                    ? props.network.wethAddress
+                    : bestRoute[i],
+                  (await bestRoute[i + 1].toString()) === "eth" ||
+                    (await bestRoute[i + 1].toString()) === "bnb"
+                    ? props.network.wethAddress
+                    : bestRoute[i + 1],
                   props.network.factory
                 );
                 xx.push(x);
@@ -517,62 +770,17 @@ const SwapPage = (props) => {
             }
             setReservesDetails(xx);
             setSmartRouteData(p);
+          } else {
+            alert.error("No route found");
+            setInput0("");
+            setInput1("");
           }
         }
       } else {
-        // console.log("bestRoute[0]");
-        if (routes.length > 0) {
-          let bestPrice = 0;
-          let bestRoute = [];
-          for (const item of routes) {
-            let price = await getAmountOut(item, input0, props.network.router);
-            if (price > bestPrice) {
-              bestPrice = price;
-              bestRoute = item;
-            }
-          }
-          // console.log(bestRoute[0]);
-          setInput1(bestPrice);
-          setSmartRoute(bestRoute);
-          let p = [];
-          // reservesDeatils updating
-          let xx = [];
-          for (let i = 0; i < bestRoute.length; i++) {
-            for (let j = 0; j < Object.values(poolAssets).length; j++) {
-              if (
-                (await Object.values(poolAssets)
-                  [j].token0Data.tokenAddress.toString()
-                  .toLowerCase()) ===
-                (await bestRoute[i].toString().toLowerCase())
-              ) {
-                p.push(Object.values(poolAssets)[j].token0Data);
-                break;
-              } else if (
-                (await Object.values(poolAssets)
-                  [j].token1Data.tokenAddress.toString()
-                  .toLowerCase()) ===
-                (await bestRoute[i].toString().toLowerCase())
-              ) {
-                p.push(Object.values(poolAssets)[j].token1Data);
-                break;
-              }
-            }
-            // reservesDeatils updating
-            if (i < bestRoute.length - 1) {
-              let x = await fetchReserves(
-                bestRoute[i],
-                bestRoute[i + 1],
-                props.network.factory
-              );
-              xx.push(x);
-            }
-          }
-          setReservesDetails(xx);
-          setSmartRouteData(p);
-        }
+        alert.info("Please wait while loading data");
+        setInput0("");
+        setInput1("");
       }
-    } else {
-      alert.error("No route found");
     }
   };
 
@@ -607,7 +815,9 @@ const SwapPage = (props) => {
         setIsToken0Approved(0);
         async function chechAlreadyTokenApproved() {
           let p = await isTokenAlreadyApproved(
-            token0Data.tokenAddress,
+            token0Data.isEth
+              ? props.network.wethAddress
+              : token0Data.tokenAddress,
             input0,
             user.account,
             props.network.router._address
@@ -621,7 +831,16 @@ const SwapPage = (props) => {
         token0Data.tokenAddress.toString().toLowerCase() !==
         token1Data.tokenAddress.toString().toLowerCase()
       ) {
-        setPrice(input0 / input1);
+        if (
+          token0Data.isEth &&
+          token1Data.tokenAddress
+            .toString()
+            .toLowerCase()
+            .includes(props.network.wethAddress.toString().toLowerCase())
+        ) {
+        } else {
+          setPrice(input0 / input1);
+        }
       } else {
         alert.error("Identical tokens found");
       }
@@ -640,13 +859,28 @@ const SwapPage = (props) => {
     // console.log(smartRoute);
     if (smartRoute && smartRoute.length > 0 && input0 && input0 > 0) {
       // console.log(smartRoute[0]);
+      await setFetching(true);
+      let smRoute = [...smartRoute];
+      if (
+        smRoute.length > 1 &&
+        (smRoute[0].toString() === "eth" || smRoute[0].toString() === "bnb")
+      ) {
+        smRoute[0] = props.network.wethAddress;
+      } else if (
+        smRoute.length > 1 &&
+        (smRoute[smRoute.length - 1].toString() === "eth" ||
+          smRoute[smRoute.length - 1].toString() === "bnb")
+      ) {
+        smRoute[smRoute.length - 1] = props.network.wethAddress;
+      }
+
       let poolPrices = await getArrayOfPoolPrice(
-        smartRoute,
+        smRoute,
         props.network.factory
       );
 
       let priceAtPaids = await getArrayOfPriceAtPaid(
-        smartRoute,
+        smRoute,
         input0,
         props.network.router
       );
@@ -670,6 +904,7 @@ const SwapPage = (props) => {
         r = (r / PIs.length) * 100;
         setPriceImpact(r);
       }
+      await setFetching(false);
     }
   };
   useEffect(() => {
@@ -678,15 +913,30 @@ const SwapPage = (props) => {
 
   // // update priceimpact on smartroute changes
   const get5 = async () => {
+    await setFetching(true);
     // console.log(smartRoute);
     if (smartRoute && smartRoute.length > 0 && input0 && input0 > 0) {
       //  console.log(smartRoute[0]);
+
+      let smRoute = [...smartRoute];
+      if (
+        smRoute.length > 1 &&
+        (smRoute[0].toString() === "eth" || smRoute[0].toString() === "bnb")
+      ) {
+        smRoute[0] = props.network.wethAddress;
+      } else if (
+        smRoute.length > 1 &&
+        (smRoute[smRoute.length - 1].toString() === "eth" ||
+          smRoute[smRoute.length - 1].toString() === "bnb")
+      ) {
+        smRoute[smRoute.length - 1] = props.network.wethAddress;
+      }
       let poolPrices = await getArrayOfPoolPrice(
-        smartRoute,
+        smRoute,
         props.network.factory
       );
       let priceAtPaids = await getArrayOfPriceAtPaid(
-        smartRoute,
+        smRoute,
         input0,
         props.network.router
       );
@@ -716,23 +966,72 @@ const SwapPage = (props) => {
           if (
             (await Object.values(poolAssets)
               [j].token0Data.tokenAddress.toString()
-              .toLowerCase()) === (await smartRoute[i].toString().toLowerCase())
+              .toLowerCase()) ===
+            ((await smartRoute[i].toString()) === "eth" ||
+            (await smartRoute[i].toString()) === "bnb"
+              ? props.network.wethAddress.toString().toLowerCase()
+              : await smartRoute[i].toString().toLowerCase())
           ) {
-            m.push(Object.values(poolAssets)[j].token0Data);
-            break;
+            if ((await smartRoute[i].toString()) === "eth") {
+              let tl = [...(await Object.values(poolAssets))];
+              let tq = tl[j];
+              let tk = tq.token0Data;
+              //tk.tokenAddress = "eth";
+              tk.name = "ether";
+              tk.symbol = "ETH";
+              m.push(tk);
+              break;
+            } else if ((await smartRoute[i].toString()) === "bnb") {
+              let tl = [...(await Object.values(poolAssets))];
+              let tq = tl[j];
+              let tk = tq.token0Data;
+              // tk.tokenAddress = "bnb";
+              tk.name = "Binance chain native token";
+              tk.symbol = "BNB";
+              m.push(tk);
+              break;
+            } else {
+              m.push(Object.values(poolAssets)[j].token0Data);
+              break;
+            }
           } else if (
             (await Object.values(poolAssets)
               [j].token1Data.tokenAddress.toString()
-              .toLowerCase()) === (await smartRoute[i].toString().toLowerCase())
+              .toLowerCase()) ===
+            ((await smartRoute[i].toString()) === "eth" ||
+            (await smartRoute[i].toString()) === "bnb"
+              ? props.network.wethAddress.toString().toLowerCase()
+              : await smartRoute[i].toString().toLowerCase())
           ) {
-            m.push(Object.values(poolAssets)[j].token1Data);
-            break;
+            if ((await smartRoute[i].toString()) === "eth") {
+              let tl = [...(await Object.values(poolAssets))];
+              let tq = tl[j];
+              let tk = tq.token1Data;
+              // tk.tokenAddress = "eth";
+              tk.name = "ether";
+              tk.symbol = "ETH";
+              m.push(tk);
+              break;
+            } else if ((await smartRoute[i].toString()) === "bnb") {
+              let tl = [...(await Object.values(poolAssets))];
+              let tq = tl[j];
+              let tk = tq.token1Data;
+              //  tk.tokenAddress = "bnb";
+              tk.name = "Binance chain native token";
+              tk.symbol = "BNB";
+              m.push(tk);
+              break;
+            } else {
+              m.push(Object.values(poolAssets)[j].token1Data);
+              break;
+            }
           }
         }
       }
       setSmartRouteData(m);
       //console.log(Object.values(poolAssets).length);
     }
+    await setFetching(false);
   };
   useEffect(() => {
     get5();
@@ -780,6 +1079,7 @@ const SwapPage = (props) => {
     token0Data: token0Data,
     token1Data: token1Data,
     sendInputAmount0: getInput0,
+    sendFetchingStatus: setFetching,
     amount0: input0,
     sendInputAmount1: getInput1,
     sendSmartRoute: getSmartRoute,
@@ -789,6 +1089,7 @@ const SwapPage = (props) => {
     token0Data: token0Data,
     token1Data: token1Data,
     sendInputAmount0: getInput0,
+    sendFetchingStatus: setFetching,
     amount1: input1,
     sendInputAmount1: getInput1,
     sendSmartRoute: getSmartRoute,
@@ -804,15 +1105,33 @@ const SwapPage = (props) => {
     price: price,
     priceImpact: priceImpact,
     func: trade,
-    isDisable:
-      token0Data &&
-      token0Data.tokenAddress.toString().toLowerCase() ===
-        props.network.wethAddress.toString().toLowerCase() &&
-      !isSwapButtonClicked
-        ? false
-        : isAlreadyTokenApproved && !isSwapButtonClicked
-        ? false
-        : isToken0Approved !== 2 || isSwapButtonClicked,
+    isDisable: isFetching
+      ? true
+      : token0Data &&
+        token1Data &&
+        token0Data.isEth &&
+        token1Data.tokenAddress
+          .toString()
+          .toLowerCase()
+          .includes(props.network.wethAddress.toString().toLowerCase())
+      ? false
+      : token0Data &&
+        token0Data.isEth &&
+        // token0Data.tokenAddress.toString().toLowerCase() ===
+        //   props.network.wethAddress.toString().toLowerCase() &&
+        !isSwapButtonClicked
+      ? false
+      : isAlreadyTokenApproved && !isSwapButtonClicked
+      ? false
+      : isToken0Approved !== 2 || isSwapButtonClicked,
+    // token0Data &&
+    // token0Data.tokenAddress.toString().toLowerCase() ===
+    //   props.network.wethAddress.toString().toLowerCase() &&
+    // !isSwapButtonClicked
+    //   ? false
+    //   : isAlreadyTokenApproved && !isSwapButtonClicked
+    //   ? false
+    //   : isToken0Approved !== 2 || isSwapButtonClicked,
     transactionHashData: transactionHashData,
     network: props.network,
     isSwapTransaction: true,
@@ -834,8 +1153,24 @@ const SwapPage = (props) => {
             SwapBoxToParams={SwapBoxToParams}
             network={props.network}
           />
-
-          {token0Data && token1Data && input0 && input1 ? (
+          {isFetching ? <FontSizeLoader text="fetching price..." /> : null}
+          {token0Data &&
+          token1Data &&
+          token0Data.isEth &&
+          token1Data.tokenAddress
+            .toString()
+            .toLowerCase()
+            .includes(
+              props.network.wethAddress.toString().toLowerCase()
+            ) ? null : token0Data &&
+            token1Data &&
+            token1Data.isEth &&
+            token0Data.tokenAddress
+              .toString()
+              .toLowerCase()
+              .includes(
+                props.network.wethAddress.toString().toLowerCase()
+              ) ? null : token0Data && token1Data && input0 && input1 ? (
             <div className={styles.transaction_details_box}>
               <div>
                 <p className={styles.price}>Price</p>
@@ -884,8 +1219,9 @@ const SwapPage = (props) => {
           {isAuthenticated &&
           !isAlreadyTokenApproved &&
           token0Data &&
-          token0Data.tokenAddress.toString().toLowerCase() !==
-            props.network.wethAddress.toString().toLowerCase() &&
+          !token0Data.isEth &&
+          // token0Data.tokenAddress.toString().toLowerCase() !==
+          //   props.network.wethAddress.toString().toLowerCase() &&
           token1Data &&
           input0 &&
           input0 > 0 &&
@@ -915,6 +1251,8 @@ const SwapPage = (props) => {
                 <DynamicButton text={"Select a Token"} isDisable={true} />
               ) : !token1Data ? (
                 <DynamicButton text={"Select a Token"} isDisable={true} />
+              ) : token0Data.tokenAddress === token1Data.tokenAddress ? (
+                <DynamicButton text="Invalid Pair" isDisable={true} />
               ) : !input0 ? (
                 <DynamicButton text={"Enter an Amount"} isDisable={true} />
               ) : !input1 ? (
@@ -923,20 +1261,35 @@ const SwapPage = (props) => {
                 <DynamicButton text={"Enter an Amount"} isDisable={true} />
               ) : input0 > token0Data.balance ? (
                 <DynamicButton text={"Insufficient Balance"} isDisable={true} />
-              ) : !smartRoute.length > 0 ? (
-                <DynamicButton text="wait a moment" isDisable={true} />
-              ) : token0Data.tokenAddress === token1Data.tokenAddress ? (
-                <DynamicButton
-                  text="Identical Tokens Selected"
-                  isDisable={true}
-                />
               ) : (
+                //: // : !smartRoute.length > 0 &&
+                //   !token0Data.isEth &&
+                //   !token1Data.tokenAddress
+                //     .toString()
+                //     .toLowerCase()
+                //     .includes(
+                //       props.network.wethAddress.toString().toLowerCase()
+                //     ) ? (
+                //   <DynamicButton text="wait a moment" isDisable={true} />
+                // )
+
                 <SwapButton
                   swap={confirmTransactionModalToggle}
                   isDisable={
-                    token0Data.tokenAddress.toString().toLowerCase() ===
-                      props.network.wethAddress.toString().toLowerCase() &&
-                    !isSwapButtonClicked
+                    isFetching
+                      ? true
+                      : token0Data.isEth &&
+                        token1Data.tokenAddress
+                          .toString()
+                          .toLowerCase()
+                          .includes(
+                            props.network.wethAddress.toString().toLowerCase()
+                          )
+                      ? false
+                      : token0Data.isEth &&
+                        // token0Data.tokenAddress.toString().toLowerCase() ===
+                        //   props.network.wethAddress.toString().toLowerCase() &&
+                        !isSwapButtonClicked
                       ? false
                       : isAlreadyTokenApproved && !isSwapButtonClicked
                       ? false
@@ -959,7 +1312,23 @@ const SwapPage = (props) => {
         </div>
       </div>
 
-      {token0Data && token1Data && input0 && input1 ? (
+      {token0Data &&
+      token1Data &&
+      token0Data.isEth &&
+      token1Data.tokenAddress
+        .toString()
+        .toLowerCase()
+        .includes(
+          props.network.wethAddress.toString().toLowerCase()
+        ) ? null : token0Data &&
+        token1Data &&
+        token1Data.isEth &&
+        token0Data.tokenAddress
+          .toString()
+          .toLowerCase()
+          .includes(
+            props.network.wethAddress.toString().toLowerCase()
+          ) ? null : token0Data && token1Data && input0 && input1 ? (
         <div className={styles.advance_details_accordion}>
           <Accordion open={open} toggle={toggle}>
             <AccordionItem>

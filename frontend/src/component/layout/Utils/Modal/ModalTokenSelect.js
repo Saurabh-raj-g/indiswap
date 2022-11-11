@@ -5,6 +5,8 @@ import { Modal, ModalBody, ModalHeader } from "reactstrap";
 import ManageTokenModal from "./ManageTokenModal";
 import styles from "./ModalTokenSelect.module.css";
 import TokenList from "../../../../TokenList";
+
+import XsmallLoader from "../../Loader/XsmallLoader.js";
 import {
   getTokenData,
   getTokenDataWithBalance,
@@ -82,6 +84,8 @@ const ModalTokenSelect = ({ modalParams, network }) => {
 
   const [manageTokenModal, setManageTokenModal] = useState(false);
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const { user, error, isAuthenticated } = useSelector((state) => state.user);
 
   const { isTokenFromMOpen } = useSelector((state) => state.isTokenFromMOpen);
@@ -151,6 +155,7 @@ const ModalTokenSelect = ({ modalParams, network }) => {
       if (network) {
         // console.log(chainChanged.chainId);
         if (chains.networks.includes(network.chainId)) {
+          setIsLoading(true);
           for (
             let i = 0;
             i < (await TokenList.get(network.chainId).length);
@@ -180,9 +185,14 @@ const ModalTokenSelect = ({ modalParams, network }) => {
               network.chainId,
               user.account
             );
+            let mk = {
+              isAddedByMe: true,
+            };
+            await Object.assign(p, mk);
             tm.push(p);
           }
           setlocalStorageTokens(tm);
+          setIsLoading(false);
         } else {
           setLit([]);
           setlocalStorageTokens([]);
@@ -196,6 +206,7 @@ const ModalTokenSelect = ({ modalParams, network }) => {
       if (network) {
         //console.log(chains.networks.includes(chainChanged.chainId));
         if (chains.networks.includes(network.chainId)) {
+          setIsLoading(true);
           for (
             let i = 0;
             i < (await TokenList.get(network.chainId).length);
@@ -232,6 +243,7 @@ const ModalTokenSelect = ({ modalParams, network }) => {
                 : []
               : []
           );
+          setIsLoading(false);
         } else {
           setLit([]);
           setlocalStorageTokens([]);
@@ -300,25 +312,30 @@ const ModalTokenSelect = ({ modalParams, network }) => {
         <div className={styles.box_overflow}>
           {!search ? (
             <>
-              {lit.length > 0 &&
-                lit.map((token) => (
-                  <TokenCard
-                    key={token ? token.symbol : null}
-                    token={token}
-                    func={selectToken}
-                    auth={isAuthenticated}
-                  />
-                ))}
-              {localStorageTokens
-                ? Object.values(localStorageTokens).map((token) => (
+              {isLoading ? (
+                <XsmallLoader text="Loading..." />
+              ) : (
+                <>
+                  {lit.map((token) => (
                     <TokenCard
                       key={token ? token.symbol : null}
                       token={token}
                       func={selectToken}
                       auth={isAuthenticated}
                     />
-                  ))
-                : null}
+                  ))}
+                  {localStorageTokens
+                    ? Object.values(localStorageTokens).map((token) => (
+                        <TokenCard
+                          key={token ? token.symbol : null}
+                          token={token}
+                          func={selectToken}
+                          auth={isAuthenticated}
+                        />
+                      ))
+                    : null}
+                </>
+              )}
             </>
           ) : (
             filteredTokens.map((token) => (
@@ -355,3 +372,13 @@ export default ModalTokenSelect;
 // }
 // //</p>
 // //*/}
+
+//{lit.length > 0 &&
+//   lit.map((token) => (
+//     <TokenCard
+//       key={token ? token.symbol : null}
+//       token={token}
+//       func={selectToken}
+//       auth={isAuthenticated}
+//     />
+//   ))}

@@ -14,6 +14,7 @@ import {
   getpairContract,
   getAmoutOutRemoveLiquidity,
   SmartRoutes,
+  getWethContract,
 } from "../../../../actions/contractFunction";
 import styles from "./SwapBoxFrom.module.css";
 import { useAlert } from "react-alert";
@@ -28,49 +29,75 @@ function SwapBoxFrom({ SwapBoxFromParams, network }) {
   const { poolAssets } = useSelector((state) => state.poolAssets);
 
   const setPoolPriceForAddLiqORJoinLiq = async (amount) => {
-    const reserves = await fetchReserves(
-      SwapBoxFromParams.token0Data.tokenAddress,
-      SwapBoxFromParams.token1Data.tokenAddress,
-      network.factory
-    );
-    if (reserves[0] === 0 && reserves[1] === 0) {
-      let p = [];
-      p.push(0);
-      p.push(0);
-      p.push(100);
-      await SwapBoxFromParams.sendPoolPrice(p);
+    if (
+      (SwapBoxFromParams.token0Data.isEth &&
+        (await SwapBoxFromParams.token1Data.tokenAddress
+          .toString()
+          .toLowerCase()
+          .includes(await network.wethAddress.toString().toLowerCase()))) ||
+      ((await SwapBoxFromParams.token0Data.tokenAddress
+        .toString()
+        .toLowerCase()
+        .includes(await network.wethAddress.toString().toLowerCase())) &&
+        SwapBoxFromParams.token1Data.isEth)
+    ) {
     } else {
-      if (amount > 0) {
-        const quote = await quoteAddLiquidity(
-          SwapBoxFromParams.token0Data.tokenAddress,
-          SwapBoxFromParams.token1Data.tokenAddress,
-          amount,
-          false,
-          network.factory
-        );
-
-        if (quote.length > 0) {
-          await SwapBoxFromParams.sendInputAmount1(Number(quote[1]));
-          let p = [];
-          p.push(reserves[1] / reserves[0]);
-          p.push(reserves[0] / reserves[1]);
-          const pair = await getPairAddress(
-            SwapBoxFromParams.token0Data.tokenAddress,
-            SwapBoxFromParams.token1Data.tokenAddress,
+      const reserves = await fetchReserves(
+        SwapBoxFromParams.token0Data.isEth
+          ? await network.wethAddress
+          : SwapBoxFromParams.token0Data.tokenAddress,
+        SwapBoxFromParams.token1Data.isEth
+          ? await network.wethAddress
+          : SwapBoxFromParams.token1Data.tokenAddress,
+        network.factory
+      );
+      if (reserves[0] === 0 && reserves[1] === 0) {
+        let p = [];
+        p.push(0);
+        p.push(0);
+        p.push(100);
+        await SwapBoxFromParams.sendPoolPrice(p);
+      } else {
+        if (amount > 0) {
+          const quote = await quoteAddLiquidity(
+            SwapBoxFromParams.token0Data.isEth
+              ? await network.wethAddress
+              : SwapBoxFromParams.token0Data.tokenAddress,
+            SwapBoxFromParams.token1Data.isEth
+              ? await network.wethAddress
+              : SwapBoxFromParams.token1Data.tokenAddress,
+            amount,
+            false,
             network.factory
           );
-          if (pair) {
-            const pairContract = await getpairContract(pair);
-            const _totalSupply =
-              Number(await pairContract.methods.totalSupply().call()) *
-              10 ** -Number(await pairContract.methods.decimals().call());
-            let liqPercent =
-              (Number(quote[2]) / (Number(_totalSupply) + Number(quote[2]))) *
-              100;
-            p.push(Number(liqPercent));
+
+          if (quote.length > 0) {
+            await SwapBoxFromParams.sendInputAmount1(Number(quote[1]));
+            let p = [];
+            p.push(reserves[1] / reserves[0]);
+            p.push(reserves[0] / reserves[1]);
+            const pair = await getPairAddress(
+              SwapBoxFromParams.token0Data.isEth
+                ? await network.wethAddress
+                : SwapBoxFromParams.token0Data.tokenAddress,
+              SwapBoxFromParams.token1Data.isEth
+                ? await network.wethAddress
+                : SwapBoxFromParams.token1Data.tokenAddress,
+              network.factory
+            );
+            if (pair) {
+              const pairContract = await getpairContract(pair);
+              const _totalSupply =
+                Number(await pairContract.methods.totalSupply().call()) *
+                10 ** -Number(await pairContract.methods.decimals().call());
+              let liqPercent =
+                (Number(quote[2]) / (Number(_totalSupply) + Number(quote[2]))) *
+                100;
+              p.push(Number(liqPercent));
+            }
+            //console.log(" from " + p[2]);
+            await SwapBoxFromParams.sendPoolPrice(p);
           }
-          //console.log(" from " + p[2]);
-          await SwapBoxFromParams.sendPoolPrice(p);
         }
       }
     }
@@ -102,12 +129,16 @@ function SwapBoxFrom({ SwapBoxFromParams, network }) {
       await SwapBoxFromParams.sendInputAmount0(event.target.value);
 
       if (SwapBoxFromParams.isAddLiquidityOn) {
+        await SwapBoxFromParams.sendFetchingStatus(true);
         await setPoolPriceForAddLiqORJoinLiq(event.target.value);
+        await SwapBoxFromParams.sendFetchingStatus(false);
       } else if (SwapBoxFromParams.isJoinPoolOn) {
         await setPoolPriceForAddLiqORJoinLiq(event.target.value);
       } else if (SwapBoxFromParams.isRemoveMyLiquidityOn) {
         if (isAuthenticated) {
-          if (event.target.value > 0) {
+          if (event.target.value > SwapBoxFromParams.token0Data.balance) {
+            alert.error("insufficient liquidity");
+          } else if (event.target.value > 0) {
             const data = await getAmoutOutRemoveLiquidity(
               SwapBoxFromParams.token0Data.tokenAddress,
               SwapBoxFromParams.token1Data.tokenAddress,
@@ -124,55 +155,96 @@ function SwapBoxFrom({ SwapBoxFromParams, network }) {
           alert.error("You are not authorised");
         }
       } else {
-        if (
-          await checkForPairExists(
-            SwapBoxFromParams.token0Data.tokenAddress,
-            SwapBoxFromParams.token1Data.tokenAddress,
-            network.factory
-          )
-        ) {
-          if (event.target.value > 0) {
-            const amount = await getAmountOut(
-              [
-                SwapBoxFromParams.token0Data.tokenAddress,
-                SwapBoxFromParams.token1Data.tokenAddress,
-              ],
-              event.target.value,
-              network.router
-            );
+        // if (
+        //   await checkForPairExists(
+        //     SwapBoxFromParams.token0Data.tokenAddress,
+        //     SwapBoxFromParams.token1Data.tokenAddress,
+        //     network.factory
+        //   )
+        // ) {
+        //   if (event.target.value > 0) {
+        //     const amount = await getAmountOut(
+        //       [
+        //         SwapBoxFromParams.token0Data.tokenAddress,
+        //         SwapBoxFromParams.token1Data.tokenAddress,
+        //       ],
+        //       event.target.value,
+        //       network.router
+        //     );
 
-            await SwapBoxFromParams.sendInputAmount1(amount);
-            await SwapBoxFromParams.sendSmartRoute([
-              SwapBoxFromParams.token0Data.tokenAddress,
-              SwapBoxFromParams.token1Data.tokenAddress,
-            ]);
-            //  console.log("gha");
-          }
-        } else if (poolAssets && Object.values(poolAssets).length > 0) {
-          if (event.target.value > 0) {
-            let routes = await SmartRoutes(
-              Object.values(poolAssets),
-              SwapBoxFromParams.token0Data.tokenAddress,
-              SwapBoxFromParams.token1Data.tokenAddress
-            );
-            if (routes.length > 0) {
-              let bestPrice = 0;
-              let bestRoute = [];
-              for (const item of routes) {
-                let price = await getAmountOut(
-                  item,
-                  event.target.value,
-                  network.router
-                );
-                if (price > bestPrice) {
-                  bestPrice = price;
-                  bestRoute = item;
+        //     await SwapBoxFromParams.sendInputAmount1(amount);
+        //     await SwapBoxFromParams.sendSmartRoute([
+        //       SwapBoxFromParams.token0Data.tokenAddress,
+        //       SwapBoxFromParams.token1Data.tokenAddress,
+        //     ]);
+        //     //  console.log("gha");
+        //   }
+        // } else
+        if (event.target.value > 0) {
+          //console.log("nc");
+          if (
+            SwapBoxFromParams.token0Data.isEth &&
+            SwapBoxFromParams.token1Data.tokenAddress
+              .toString()
+              .toLowerCase()
+              .includes(await network.wethAddress.toString().toLowerCase())
+          ) {
+            //console.log("hsk");
+            await SwapBoxFromParams.sendInputAmount1(event.target.value);
+            //let weth = await getWethContract(await network.wethAddress)
+          } else if (
+            SwapBoxFromParams.token1Data.isEth &&
+            SwapBoxFromParams.token0Data.tokenAddress
+              .toString()
+              .toLowerCase()
+              .includes(await network.wethAddress.toString().toLowerCase())
+          ) {
+            await SwapBoxFromParams.sendInputAmount1(event.target.value);
+          } else {
+            if (poolAssets && Object.values(poolAssets).length > 0) {
+              await SwapBoxFromParams.sendFetchingStatus(true);
+              let p1 = (await SwapBoxFromParams.token0Data.isEth)
+                ? await network.wethAddress
+                : await SwapBoxFromParams.token0Data.tokenAddress;
+              let p2 = (await SwapBoxFromParams.token1Data.isEth)
+                ? await network.wethAddress
+                : await SwapBoxFromParams.token1Data.tokenAddress;
+              // console.log([p1, p2]);
+              // console.log(Object.values(poolAssets));
+              let routes = await SmartRoutes(Object.values(poolAssets), p1, p2);
+              if (routes.length > 0) {
+                let bestPrice = 0;
+                let bestRoute = [];
+                for (const item of routes) {
+                  let price = await getAmountOut(
+                    item,
+                    event.target.value,
+                    network.router
+                  );
+                  if (price > bestPrice) {
+                    bestPrice = price;
+                    bestRoute = item;
+                  }
                 }
+                // eth -weth
+                if (SwapBoxFromParams.token0Data.isEth) {
+                  //console.log("dka");
+                  bestRoute[0] = SwapBoxFromParams.token0Data.tokenAddress;
+                } else if (SwapBoxFromParams.token1Data.isEth) {
+                  bestRoute[bestRoute.length - 1] =
+                    SwapBoxFromParams.token1Data.tokenAddress;
+                }
+                //
+                // console.log(bestRoute);
+                await SwapBoxFromParams.sendInputAmount1(bestPrice);
+                await SwapBoxFromParams.sendSmartRoute(bestRoute);
+              } else {
+                alert.error("No route found");
               }
-              await SwapBoxFromParams.sendInputAmount1(bestPrice);
-              await SwapBoxFromParams.sendSmartRoute(bestRoute);
+              await SwapBoxFromParams.sendFetchingStatus(false);
             } else {
-              alert.error("No route found");
+              await SwapBoxFromParams.sendInputAmount0("");
+              alert.info("Please wait while loading data");
             }
           }
         }
@@ -226,55 +298,96 @@ function SwapBoxFrom({ SwapBoxFromParams, network }) {
           }
         }
       } else {
-        if (
-          await checkForPairExists(
-            SwapBoxFromParams.token0Data.tokenAddress,
-            SwapBoxFromParams.token1Data.tokenAddress,
-            network.factory
-          )
-        ) {
-          if (SwapBoxFromParams.token0Data.balance > 0) {
-            const amount = await getAmountOut(
-              [
-                SwapBoxFromParams.token0Data.tokenAddress,
-                SwapBoxFromParams.token1Data.tokenAddress,
-              ],
-              SwapBoxFromParams.token0Data.balance,
-              network.router
-            );
+        // if (
+        //   await checkForPairExists(
+        //     SwapBoxFromParams.token0Data.tokenAddress,
+        //     SwapBoxFromParams.token1Data.tokenAddress,
+        //     network.factory
+        //   )
+        // ) {
+        //   if (SwapBoxFromParams.token0Data.balance > 0) {
+        //     const amount = await getAmountOut(
+        //       [
+        //         SwapBoxFromParams.token0Data.tokenAddress,
+        //         SwapBoxFromParams.token1Data.tokenAddress,
+        //       ],
+        //       SwapBoxFromParams.token0Data.balance,
+        //       network.router
+        //     );
 
-            await SwapBoxFromParams.sendInputAmount1(amount);
-            await SwapBoxFromParams.sendSmartRoute([
-              SwapBoxFromParams.token0Data.tokenAddress,
-              SwapBoxFromParams.token1Data.tokenAddress,
-            ]);
-          }
-        } else if (poolAssets && Object.values(poolAssets).length > 0) {
-          if (SwapBoxFromParams.token0Data.balance > 0) {
-            let routes = await SmartRoutes(
-              Object.values(poolAssets),
-              SwapBoxFromParams.token0Data.tokenAddress,
-              SwapBoxFromParams.token1Data.tokenAddress
-            );
-            if (routes.length > 0) {
-              let bestPrice = 0;
-              let bestRoute = [];
-              for (const item of routes) {
-                let price = await getAmountOut(
-                  item,
-                  SwapBoxFromParams.token0Data.balance,
-                  network.router
-                );
-                if (price > bestPrice) {
-                  bestPrice = price;
-                  bestRoute = item;
+        //     await SwapBoxFromParams.sendInputAmount1(amount);
+        //     await SwapBoxFromParams.sendSmartRoute([
+        //       SwapBoxFromParams.token0Data.tokenAddress,
+        //       SwapBoxFromParams.token1Data.tokenAddress,
+        //     ]);
+        //   }
+        // } else
+
+        if (
+          SwapBoxFromParams.token0Data.isEth &&
+          SwapBoxFromParams.token1Data.tokenAddress
+            .toString()
+            .toLowerCase()
+            .includes(await network.wethAddress.toString().toLowerCase())
+        ) {
+          await SwapBoxFromParams.sendInputAmount1(
+            SwapBoxFromParams.token0Data.balance
+          );
+        } else if (
+          SwapBoxFromParams.token1Data.isEth &&
+          SwapBoxFromParams.token0Data.tokenAddress
+            .toString()
+            .toLowerCase()
+            .includes(await network.wethAddress.toString().toLowerCase())
+        ) {
+          await SwapBoxFromParams.sendInputAmount1(
+            SwapBoxFromParams.token0Data.balance
+          );
+        } else {
+          if (poolAssets && Object.values(poolAssets).length > 0) {
+            if (SwapBoxFromParams.token0Data.balance > 0) {
+              await SwapBoxFromParams.sendFetchingStatus(true);
+              let routes = await SmartRoutes(
+                Object.values(poolAssets),
+                SwapBoxFromParams.token0Data.isEth
+                  ? network.wethAddress
+                  : SwapBoxFromParams.token0Data.tokenAddress,
+                SwapBoxFromParams.token1Data.isEth
+                  ? network.wethAddress
+                  : SwapBoxFromParams.token1Data.tokenAddress
+              );
+              if (routes.length > 0) {
+                let bestPrice = 0;
+                let bestRoute = [];
+                for (const item of routes) {
+                  let price = await getAmountOut(
+                    item,
+                    SwapBoxFromParams.token0Data.balance,
+                    network.router
+                  );
+                  if (price > bestPrice) {
+                    bestPrice = price;
+                    bestRoute = item;
+                  }
                 }
+                // eth -weth
+                if (SwapBoxFromParams.token0Data.isEth) {
+                  bestRoute[0] = SwapBoxFromParams.token0Data.tokenAddress;
+                } else if (SwapBoxFromParams.token1Data.isEth) {
+                  bestRoute[bestRoute.length - 1] =
+                    SwapBoxFromParams.token1Data.tokenAddress;
+                }
+                //
+                await SwapBoxFromParams.sendInputAmount1(bestPrice);
+                await SwapBoxFromParams.sendSmartRoute(bestRoute);
+              } else {
+                alert.error("No route found");
               }
-              await SwapBoxFromParams.sendInputAmount1(bestPrice);
-              await SwapBoxFromParams.sendSmartRoute(bestRoute);
-            } else {
-              alert.error("No route found");
+              await SwapBoxFromParams.sendFetchingStatus(true);
             }
+          } else {
+            await SwapBoxFromParams.sendInputAmount0("");
+            alert.info("Please wait while loading data");
           }
         }
       }

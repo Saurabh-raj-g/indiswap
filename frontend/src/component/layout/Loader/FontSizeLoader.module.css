@@ -1,0 +1,45 @@
+/* .container1 {
+  position: relative;
+  width: 100%;
+   padding: 5px 2vmax 15px 2vmax; 
+   overflow: hidden;
+  display: flex;
+  flex-direction: row;
+  place-items: center; 
+   max-width: 100%;
+} */
+
+.loading {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  /* padding: 10px 2vmax 10px 2vmax; */
+  /* overflow: hidden;
+  display: grid;
+  place-items: center; */
+  /* max-width: 100%; */
+}
+
+.loading > div {
+  position: relative;
+  width: 1.3vw;
+  height: 1.3vw;
+  border-bottom: 2px solid rgba(255, 200, 0, 0.877);
+
+  border-radius: 50%;
+
+  animation: loadingRotate 800ms linear infinite;
+}
+
+@keyframes loadingRotate {
+  to {
+    transform: rotateZ(-360deg);
+  }
+}
+.text {
+  position: relative;
+  margin-left: 2%;
+  font-size: medium;
+  color: rgba(255, 200, 0, 0.877);
+}
